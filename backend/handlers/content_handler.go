@@ -21,6 +21,7 @@ func GetContent(c *fiber.Ctx) error {
 		conn = db.GetDB()
 		rows *sql.Rows
 		err  error
+		id   = c.Params("type")
 	)
 
 	rows, err = conn.Query(`
@@ -30,6 +31,7 @@ func GetContent(c *fiber.Ctx) error {
 		c.content_year,
 		g.gender_id,
 		g.gender_name,
+		s.storage_id,
 		s.url,
 		CASE
 		WHEN c.content_type = 1 
@@ -37,8 +39,9 @@ func GetContent(c *fiber.Ctx) error {
 		ELSE 'SERIE'
 		END AS type
 	FROM content_type c
-		LEFT JOIN gender AS g ON g.gender_id = c.gender_id
-		LEFT JOIN storage AS s ON s.storage_id = c.cover_id`)
+		INNER JOIN gender AS g ON g.gender_id = c.gender_id
+		INNER JOIN storage AS s ON s.storage_id = c.cover_id
+	WHERE c.content_type = $1`, id)
 
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error al ejecutar la consulta"})
@@ -54,6 +57,7 @@ func GetContent(c *fiber.Ctx) error {
 			&content.Year,
 			&content.GenderId,
 			&content.Gender,
+			&content.StorageId,
 			&content.UrlCover,
 			&content.Type)
 
@@ -75,31 +79,147 @@ func GetContent(c *fiber.Ctx) error {
 func GetContentId(c *fiber.Ctx) error {
 
 	var (
-		obj   dto.ContentDTO
-		conn  = db.GetDB()
-		rows  *sql.Rows
-		id    = c.Params("id")
-		err   error
-		found = false
+		content                 dto.ContentDTO
+		full                    dto.ContentFullDTO
+		conn                    = db.GetDB()
+		err                     error
+		id                      = c.Params("id")
+		rowsSeason, rowsEpisode *sql.Rows
+	)
+
+	err = conn.QueryRow(`
+		SELECT
+			c.content_id,
+			c.content_title,
+			c.content_year,
+			g.gender_id,
+			g.gender_name,
+			s.storage_id,
+			s.url,
+			CASE
+				WHEN c.content_type = 1 
+				THEN 'ANIME'
+				ELSE 'SERIE'
+			END AS type
+		FROM content_type c
+		INNER JOIN gender g ON g.gender_id = c.gender_id
+		INNER JOIN storage s ON s.storage_id = c.cover_id
+		WHERE c.content_id = $1`, id).Scan(
+		&content.ContentId,
+		&content.Title,
+		&content.Year,
+		&content.GenderId,
+		&content.Gender,
+		&content.StorageId,
+		&content.UrlCover,
+		&content.Type,
+	)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		return c.Status(404).JSON(fiber.Map{"error": "Contenido no encontrado"})
+	}
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Error al obtener contenido"})
+	}
+
+	rowsSeason, err = conn.Query(`
+		SELECT 
+		    s.season_id, 
+		    s.season_name
+		FROM season AS s
+		INNER JOIN episode AS e ON e.season_id = s.season_id
+		INNER JOIN content_type AS c ON e.content_id = c.content_id
+		WHERE c.content_id = $1`, id)
+
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Error al obtener temporadas"})
+	}
+
+	defer rowsSeason.Close()
+
+	var seasons []dto.ContentSeasonDTO
+
+	for rowsSeason.Next() {
+
+		var season dto.ContentSeasonDTO
+
+		err = rowsSeason.Scan(
+			&season.SeasonId,
+			&season.SeasonName,
+		)
+		if err != nil {
+			return c.Status(500).JSON(fiber.Map{"error": "Error al leer temporada"})
+		}
+
+		rowsEpisode, err = conn.Query(`
+			SELECT 
+				e.episode_id,
+				e.episode_number,
+				e.episode_name,
+				s.storage_id,
+				s.url
+			FROM episode e
+			INNER JOIN storage s ON s.storage_id = e.video_id
+			WHERE e.season_id = $1`, season.SeasonId)
+
+		if err != nil {
+			return c.Status(500).JSON(fiber.Map{"error": "Error al obtener episodios"})
+		}
+
+		var episodes []dto.SeasonEpisodeDTO
+
+		for rowsEpisode.Next() {
+
+			var episode dto.SeasonEpisodeDTO
+
+			err = rowsEpisode.Scan(
+				&episode.EpisodeId,
+				&episode.Number,
+				&episode.Name,
+				&episode.StorageId,
+				&episode.UrlVideo,
+			)
+
+			if err != nil {
+				rowsEpisode.Close()
+				return c.Status(500).JSON(fiber.Map{"error": "Error al leer episodio"})
+			}
+
+			episodes = append(episodes, episode)
+		}
+
+		rowsEpisode.Close()
+
+		season.SeasonEpisode = episodes
+		seasons = append(seasons, season)
+	}
+
+	full = dto.ContentFullDTO{Content: content, Season: seasons}
+
+	return c.JSON(full)
+}
+
+func GetContentSeasonId(c *fiber.Ctx) error {
+
+	var (
+		obj       []dto.SeasonEpisodeDTO
+		conn      = db.GetDB()
+		rows      *sql.Rows
+		err       error
+		seasonId  = c.Params("seasonId")
+		contendId = c.Params("contendId")
 	)
 
 	rows, err = conn.Query(`
 	SELECT
-		c.content_id,
-		c.content_title,
-		c.content_year,
-		g.gender_id,
-		g.gender_name,
-		s.url,
-		CASE
-		WHEN c.content_type = 1 
-		THEN 'ANIME'
-		ELSE 'SERIE'
-		END AS type
-	FROM content_type c
-		INNER JOIN gender AS g ON g.gender_id = c.gender_id
-		INNER JOIN storage AS s ON s.storage_id = c.cover_id
-	WHERE c.content_id = $1`, id)
+		e.episode_id,
+		e.episode_name,
+		e.episode_number,
+		s.storage_id,
+		s.url
+	FROM episode e
+		INNER JOIN storage AS s ON s.storage_id = e.video_id
+		WHERE e.season_id = $1 AND e.content_id = $2`, seasonId, contendId)
 
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error al ejecutar la consulta"})
@@ -108,28 +228,28 @@ func GetContentId(c *fiber.Ctx) error {
 	defer rows.Close()
 
 	for rows.Next() {
+
+		var e dto.SeasonEpisodeDTO
+
 		err = rows.Scan(
-			&obj.ContentId,
-			&obj.Title,
-			&obj.Year,
-			&obj.GenderId,
-			&obj.Gender,
-			&obj.UrlCover,
-			&obj.Type)
+			&e.EpisodeId,
+			&e.Name,
+			&e.Number,
+			&e.StorageId,
+			&e.UrlVideo)
 
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error al leer los registros"})
 		}
 
-		found = true
+		obj = append(obj, e)
 	}
 
-	if !found {
+	if len(obj) == 0 {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "No se encontraron registros"})
 	}
 
 	return c.JSON(obj)
-
 }
 
 func GetFindContent(c *fiber.Ctx) error {
@@ -137,7 +257,7 @@ func GetFindContent(c *fiber.Ctx) error {
 	var (
 		obj     []dto.ContentDTO
 		content dto.ContentDTO
-		id      = c.Params("id")
+		id      = c.Params("type")
 		conn    = db.GetDB()
 		rows    *sql.Rows
 		err     error
@@ -154,6 +274,7 @@ func GetFindContent(c *fiber.Ctx) error {
 		c.content_year,
 		g.gender_id,
 		g.gender_name,
+		s.storage_id,
 		s.url,
 		CASE
 		WHEN c.content_type = 1 
@@ -178,6 +299,7 @@ func GetFindContent(c *fiber.Ctx) error {
 			&content.Year,
 			&content.GenderId,
 			&content.Gender,
+			&content.StorageId,
 			&content.UrlCover,
 			&content.Type)
 		if err != nil {
@@ -192,76 +314,6 @@ func GetFindContent(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(obj)
-}
-
-func GetContentType(c *fiber.Ctx) error {
-
-	var (
-		obj     []dto.ContentDTO
-		content dto.ContentDTO
-		id      = c.Params("id")
-		conn    = db.GetDB()
-		rows    *sql.Rows
-		err     error
-	)
-
-	rows, err = conn.Query(`
-	SELECT
-		c.content_id,
-		c.content_title,
-		c.content_year,
-		g.gender_name,
-		s.url,
-		CASE
-		WHEN c.content_type = 1 
-		THEN 'ANIME'
-		ELSE 'SERIE'
-		END AS type
-	FROM content_type c
-		INNER JOIN gender AS g ON g.gender_id = c.gender_id
-		INNER JOIN storage AS s ON s.storage_id = c.cover_id
-	WHERE c.content_type = $1
-	GROUP BY 
-	    c.content_id, 
-	    c.content_title, 
-	    c.content_year,
-	    g.gender_name,
-	    s.url,
-	    type`, id)
-
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error al ejecutar la consulta"})
-	}
-
-	defer rows.Close()
-
-	for rows.Next() {
-		err = rows.Scan(
-			&content.ContentId,
-			&content.Title,
-			&content.Year,
-			&content.Gender,
-			&content.UrlCover,
-			&content.Type)
-
-		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error al leer los registros"})
-		}
-
-		obj = append(obj, content)
-	}
-
-	if len(obj) == 0 {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "No se encontraron registros"})
-	}
-
-	return c.JSON(obj)
-}
-
-func GetFullContent(c *fiber.Ctx) error {
-
-	panic("sdsd")
-
 }
 
 func PostContent(c *fiber.Ctx) error {
@@ -269,8 +321,8 @@ func PostContent(c *fiber.Ctx) error {
 		content                            entities.Content
 		conn                               = db.GetDB()
 		err                                error
-		existingId                         int
 		tx                                 *sql.Tx
+		exist                              int
 		contentId, typeId, coverId, videId int
 	)
 
@@ -280,14 +332,13 @@ func PostContent(c *fiber.Ctx) error {
 	}
 
 	qContent := `SELECT COUNT(*) FROM content_type WHERE content_title  = $1`
-	err = conn.QueryRow(qContent, strings.ToUpper(content.Title)).Scan(&existingId)
-
+	err = conn.QueryRow(qContent, strings.ToUpper(content.Title)).Scan(&exist)
 	if err != nil {
 		_ = helpers.InsertLogsError(conn, "content", "error ejecutando la consulta "+err.Error())
 		return c.Status(500).JSON(fiber.Map{"message": "error ejecutando la consulta"})
 	}
 
-	if existingId > 0 {
+	if exist > 0 {
 		return c.Status(fiber.StatusConflict).JSON(fiber.Map{"error": "El registro ya existe"})
 	}
 
@@ -316,7 +367,7 @@ func PostContent(c *fiber.Ctx) error {
 	// INSERTAR EL CONTENIDO
 	qInsertContent := `
 		INSERT INTO content_type (content_title, content_type, content_year, gender_id, cover_id)
-		VALUES ($1, $2, $3, $4, $5)`
+		VALUES ($1, $2, $3, $4, $5) RETURNING content_id`
 
 	err = tx.QueryRow(qInsertContent,
 		strings.ToUpper(content.Title),
@@ -347,7 +398,7 @@ func PostContent(c *fiber.Ctx) error {
 			strings.ToUpper(episode.Name),
 			episode.Number,
 			videId,
-			episode.SeasonId,
+			content.SeasonId,
 			contentId)
 
 		if err != nil {
@@ -457,16 +508,14 @@ func PutContent(c *fiber.Ctx) error {
 		SET    episode_name 	= $1, 
 		       episode_number 	= $2, 
 		       video_id 		= $3, 
-		       season_id 		= $4, 
-		       content_id 		= $5
-		WHERE  episode_id 		= $6`
+		       season_id 		= $4
+		WHERE  episode_id 		= $5`
 
 		_, err = tx.Exec(qInsertEpisodes,
 			strings.ToUpper(episode.Name),
 			episode.Number,
 			videId,
-			episode.SeasonId,
-			contentId,
+			content.SeasonId,
 			episode.EpisodeId)
 
 		if err != nil {

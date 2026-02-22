@@ -96,13 +96,12 @@ func GetSeasonId(c *fiber.Ctx) error {
 func PostSeason(c *fiber.Ctx) error {
 
 	var (
-		season     entities.Season
-		row        *sql.Row
-		err        error
-		conn       = db.GetDB()
-		existingId int
-		tx         *sql.Tx
-		seasonId   int
+		season   entities.Season
+		row      *sql.Row
+		err      error
+		conn     = db.GetDB()
+		tx       *sql.Tx
+		seasonId int
 	)
 
 	if err = c.BodyParser(&season); err != nil {
@@ -110,11 +109,10 @@ func PostSeason(c *fiber.Ctx) error {
 	}
 
 	row = conn.QueryRow("SELECT season_id FROM season WHERE season_name = $1", strings.ToUpper(season.SeasonName))
-	if err = row.Scan(&existingId); err != nil && !errors.Is(err, sql.ErrNoRows) {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error al verificar la existencia del registro"})
+	if err = row.Scan(&seasonId); err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error al verificar el registro"})
 	}
-
-	if existingId != 0 {
+	if seasonId != 0 {
 		return c.Status(fiber.StatusConflict).JSON(fiber.Map{"error": "El registro ya existe"})
 	}
 
@@ -127,7 +125,7 @@ func PostSeason(c *fiber.Ctx) error {
 
 	defer tx.Rollback()
 
-	err = tx.QueryRow("INSERT INTO season (season_name) VALUES ($1)", strings.ToUpper(season.SeasonName)).Scan(&seasonId)
+	err = tx.QueryRow("INSERT INTO season (season_name) VALUES ($1) RETURNING season_id", strings.ToUpper(season.SeasonName)).Scan(&seasonId)
 	if err != nil {
 		_ = helpers.InsertLogsError(conn, "season", "Error al insertar el registro "+err.Error())
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error al insertar el registro"})

@@ -35,7 +35,7 @@ func StorageManager(obj dto.StorageItemDTO) (int, error) {
 				UPDATE storage 
 				SET file_name    = $1, 
 				    url 		 = $2 
-				WHERE storage_id = $4 
+				WHERE storage_id = $3 
 				RETURNING storage_id`
 
 		err = obj.TX.QueryRow(qUpdate, obj.FileName, obj.Url, obj.StorageId).Scan(&storageId)
@@ -58,5 +58,5 @@ func StorageManager(obj dto.StorageItemDTO) (int, error) {
 
 	}
 
-	return 0, nil
+	return storageId, nil
 }

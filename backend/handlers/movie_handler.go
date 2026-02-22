@@ -58,7 +58,6 @@ func GetMovie(c *fiber.Ctx) error {
 			&movie.Gender)
 
 		if err != nil {
-
 			_ = helpers.InsertLogsError(conn, "movie", "Error al leer los registros")
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error al leer los registros"})
 		}
@@ -287,7 +286,6 @@ func PutMovie(c *fiber.Ctx) error {
 	var (
 		movieID, coverID, videoID int
 		conn                      = db.GetDB()
-		exist                     int
 		err                       error
 		movie                     entities.Movie
 		tx                        *sql.Tx
@@ -299,7 +297,7 @@ func PutMovie(c *fiber.Ctx) error {
 	}
 
 	qMovie := `SELECT movie_id, video_id, cover_id FROM movie WHERE movie_id = $1`
-	err = conn.QueryRow(qMovie, movie.MovieId).Scan(&exist, &videoID, &coverID)
+	err = conn.QueryRow(qMovie, movie.MovieId).Scan(&movieID, &videoID, &coverID)
 	if err != nil {
 
 		if errors.Is(err, sql.ErrNoRows) {
@@ -356,7 +354,7 @@ func PutMovie(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"messaje": "error confirmando transacción"})
 	}
 
-	err = helpers.InsertLogs(conn, "UPDATE", "movie", movieID, "registro actualizado correctamente")
+	err = helpers.InsertLogs(conn, "UPDATE", "movie", movie.MovieId, "registro actualizado correctamente")
 	if err != nil {
 		_ = helpers.InsertLogsError(conn, "movie", "error insertando la auditoria "+err.Error())
 		return c.Status(500).JSON(fiber.Map{"messaje": "error insertando la auditoria"})

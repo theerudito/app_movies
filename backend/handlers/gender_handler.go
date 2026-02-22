@@ -79,13 +79,12 @@ func GetGenderId(c *fiber.Ctx) error {
 func PostGender(c *fiber.Ctx) error {
 
 	var (
-		gender     entities.Gender
-		conn       = db.GetDB()
-		err        error
-		row        *sql.Row
-		existingId int
-		tx         *sql.Tx
-		genderId   int
+		gender   entities.Gender
+		conn     = db.GetDB()
+		err      error
+		row      *sql.Row
+		tx       *sql.Tx
+		genderId int
 	)
 
 	if err = c.BodyParser(&gender); err != nil {
@@ -95,10 +94,10 @@ func PostGender(c *fiber.Ctx) error {
 
 	row = conn.QueryRow("SELECT gender_id FROM gender WHERE gender_name = $1", strings.ToUpper(gender.GenderName))
 
-	if err = row.Scan(&existingId); err != nil && !errors.Is(err, sql.ErrNoRows) {
+	if err = row.Scan(&genderId); err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error al verificar el registro"})
 	}
-	if existingId != 0 {
+	if genderId != 0 {
 		return c.Status(fiber.StatusConflict).JSON(fiber.Map{"error": "El registro ya existe"})
 	}
 
