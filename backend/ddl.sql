@@ -24,8 +24,7 @@ CREATE TABLE storage
 (
     storage_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     file_name  TEXT,
-    url        TEXT,
-    extension  TEXT
+    url         TEXT
 );
 
 CREATE TABLE movie

@@ -32,7 +32,7 @@ func SetupRoutes(app *fiber.App) {
 	v1.Get("/movie/:id", handlers.GetMovieId)
 	v1.Get("/movie/find/:value", handlers.GetFindMovie)
 	v1.Post("/movie", handlers.PostMovie)
-	v1.Put("/movie/:id", handlers.PutMovie)
+	v1.Put("/movie", handlers.PutMovie)
 	v1.Delete("/movie/:id", handlers.DeleteMovie)
 
 	// CONTENT
@@ -42,22 +42,20 @@ func SetupRoutes(app *fiber.App) {
 	v1.Get("/content/type_content/:id", handlers.GetContentType)
 	v1.Get("/content/full_content/:id", handlers.GetFullContent)
 	v1.Post("/content", handlers.PostContent)
-	v1.Put("/content/:id", handlers.PutContent)
-	v1.Post("/content/season", handlers.PostContentSeason)
-	v1.Put("/content/season/:id", handlers.PutContentSeason)
+	v1.Put("/content", handlers.PutContent)
 	v1.Delete("/content/:id", handlers.DeleteContent)
 
 	// SEASONS
 	v1.Get("/season", handlers.GetSeason)
 	v1.Get("/season/:id", handlers.GetSeasonId)
 	v1.Post("/season", handlers.PostSeason)
-	v1.Put("/season/:id", handlers.PutSeason)
+	v1.Put("/season", handlers.PutSeason)
 
 	// GENDER
 	v1.Get("/gender", handlers.GetGender)
 	v1.Get("/gender/:id", handlers.GetGenderId)
 	v1.Post("/gender", handlers.PostGender)
-	v1.Put("/gender/:id", handlers.PutGender)
+	v1.Put("/gender", handlers.PutGender)
 
 	// EPISODES
 	v1.Get("/episode", handlers.GetEpisode)
@@ -65,8 +63,5 @@ func SetupRoutes(app *fiber.App) {
 
 	// LOGIN
 	v1.Post("/login", handlers.PostLogin)
-
-	v1.Get("/images/:id", handlers.ImagesController)
-	v1.Get("/videos/:id", handlers.VideoController)
 
 }

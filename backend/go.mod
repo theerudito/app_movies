@@ -3,7 +3,7 @@ module github.com/theerudito/peliculas
 go 1.25.4
 
 require (
-	github.com/gofiber/fiber/v2 v2.52.9
+	github.com/gofiber/fiber/v2 v2.52.11-0.20251210115302-eb874b6f6c58
 	github.com/golang-jwt/jwt/v5 v5.3.0
 	github.com/joho/godotenv v1.5.1
 	github.com/lib/pq v1.10.9
