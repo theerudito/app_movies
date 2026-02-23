@@ -5,22 +5,22 @@ import { MoviesDTO } from "../models/Movies";
 export const Movies_List: MoviesDTO[] = [
   {
     movie_id: 1,
-    movie_title: "MAN OF HONOR",
-    movie_year: 2000,
-    movie_cover: image_1,
-    movie_url: "https://pixeldrain.com/api/file/kyjhvCUN",
-    movie_gender: "CRIMEN",
+    title: "MAN OF HONOR",
+    year: 2000,
+    url_cover: image_1,
+    url_video: "https://pixeldrain.com/api/file/kyjhvCUN",
+    gender: "CRIMEN",
   },
 ];
 
 export const Contents_List: MoviesDTO[] = [
   {
     movie_id: 1,
-    movie_title: "MAN OF HONOR",
-    movie_year: 2000,
-    movie_cover: image_1,
-    movie_url: "https://pixeldrain.com/api/file/kyjhvCUN",
-    movie_gender: "CRIMEN",
+    title: "MAN OF HONOR",
+    year: 2000,
+    url_cover: image_1,
+    url_video: "https://pixeldrain.com/api/file/kyjhvCUN",
+    gender: "CRIMEN",
   },
 ];
 

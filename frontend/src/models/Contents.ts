@@ -1,66 +1,70 @@
-import { EpisodeDTO } from "./Episodes";
-import { SeasonDTO } from "./Seasons";
-
 export interface Content {
   content_id: number;
-  content_title: string;
-  content_type: number;
-  content_cover: string;
-  content_year: number;
+  title: string;
+  type: number;
+  url_cover: string;
+  year: number;
   gender_id: number;
+  season_id: number;
+  episodes: Episodes[];
 }
 
-export interface ContentDTO {
+export interface Episodes {
+  episode_id: number;
+  number: number;
+  name: string;
+  url_video: string;
+  season_id: number;
   content_id: number;
-  content_title: string;
-  content_type: string;
-  content_cover: string;
-  content_year: number;
-  content_gender: string;
-  seasons: SeasonDTO[];
 }
 
 export const _content: Content = {
   content_id: 0,
-  content_title: "",
-  content_type: 0,
-  content_cover: "",
-  content_year: 0,
+  title: "",
+  type: 0,
+  url_cover: "",
+  year: 0,
   gender_id: 0,
-};
-
-export const _contentDTO: ContentDTO = {
-  content_id: 0,
-  content_title: "",
-  content_type: "",
-  content_cover: "",
-  content_year: 0,
-  content_gender: "",
-  seasons: [] as SeasonDTO[],
-};
-
-export interface ContentDTO_EpisodeDTO {
-  content_id: number;
-  season_id: number;
-  episodes: EpisodeDTO[];
-}
-
-export const _content_episodes: ContentDTO_EpisodeDTO = {
-  content_id: 0,
   season_id: 0,
-  episodes: [] as EpisodeDTO[],
+  episodes: [
+    {
+      episode_id: 0,
+      number: 1,
+      name: "",
+      url_video: "",
+      season_id: 0,
+      content_id: 0,
+    },
+  ],
 };
 
-export interface Content_Full_Data {
-  content: Content_Full;
-  seasons: SeasonDTO[];
+export interface ContentDTO {
+  content_id: number;
+  title: string;
+  type: string;
+  storage_id: string;
+  url_cover: string;
+  year: number;
+  gender_id: number;
+  gender: string;
 }
 
-export interface Content_Full {
-  content_id: number;
-  content_title: string;
-  content_type: string;
-  content_cover: string;
-  content_year: number;
-  content_gender: string;
+export interface ContentFullDTO {
+  season_id: number;
+  content: ContentDTO;
+  seasons: ContentSeasonDTO[];
+}
+
+export interface ContentSeasonDTO {
+  season_id: number;
+  season_name: string;
+  episodes: SeasonEpisodeDTO[];
+}
+
+export interface SeasonEpisodeDTO {
+  episode_id: number;
+  number: number;
+  name: string;
+  storage_id: number;
+  url_video: number;
 }

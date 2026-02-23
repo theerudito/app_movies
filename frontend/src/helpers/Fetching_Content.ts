@@ -1,45 +1,17 @@
 import axios from "axios";
 import {
   Content,
-  Content_Full_Data,
   ContentDTO,
-  ContentDTO_EpisodeDTO,
+  ContentFullDTO,
+  SeasonEpisodeDTO,
 } from "../models/Contents";
 import { url_base } from "./Initial";
 import { AddGuiones } from "./Añadir_Guiones";
 
-export const GET_Content = async () => {
-  try {
-    const response = await axios.get<ContentDTO[]>(`${url_base}/content`);
-    return { success: true, data: response.data };
-  } catch (error: unknown) {
-    let message = "Error desconocido";
-    if (axios.isAxiosError(error)) {
-      message = error.response?.data?.error || message;
-    }
-    return { success: false, error: message };
-  }
-};
-
-export const GET_Content_Type = async (value: number) => {
+export const GET_Contents = async (type: number) => {
   try {
     const response = await axios.get<ContentDTO[]>(
-      `${url_base}/content/type_content/${value}`
-    );
-    return { success: true, data: response.data };
-  } catch (error: unknown) {
-    let message = "Error desconocido";
-    if (axios.isAxiosError(error)) {
-      message = error.response?.data?.error || message;
-    }
-    return { success: false, error: message };
-  }
-};
-
-export const GET_Content_Episodes = async (value: number) => {
-  try {
-    const response = await axios.get<Content_Full_Data>(
-      `${url_base}/content/full_content/${value}`
+      `${url_base}/content/by/${type}`,
     );
 
     return { success: true, data: response.data };
@@ -52,10 +24,45 @@ export const GET_Content_Episodes = async (value: number) => {
   }
 };
 
-export const GET_Find_Content = async (value: string, type: number) => {
+export const GET_Content = async (id: number) => {
+  try {
+    const response = await axios.get<ContentFullDTO>(
+      `${url_base}/content/${id}`,
+    );
+
+    return { success: true, data: response.data };
+  } catch (error: unknown) {
+    let message = "Error desconocido";
+    if (axios.isAxiosError(error)) {
+      message = error.response?.data?.error || message;
+    }
+    return { success: false, error: message };
+  }
+};
+
+export const GET_Content_Season = async (
+  contendId: number,
+  seasonId: number,
+) => {
+  try {
+    const response = await axios.get<SeasonEpisodeDTO>(
+      `${url_base}/content/season/${contendId}/${seasonId}`,
+    );
+
+    return { success: true, data: response.data };
+  } catch (error: unknown) {
+    let message = "Error desconocido";
+    if (axios.isAxiosError(error)) {
+      message = error.response?.data?.error || message;
+    }
+    return { success: false, error: message };
+  }
+};
+
+export const GET_Find_Content = async (type: number, value: string) => {
   try {
     const response = await axios.get<ContentDTO[]>(
-      `${url_base}/content/find/${AddGuiones(value)}/${type}`
+      `${url_base}/content/${type}/find/${AddGuiones(value)}/${type}`,
     );
     return { success: true, data: response.data };
   } catch (error: unknown) {
@@ -80,9 +87,22 @@ export const POST_Content = async (obj: Content) => {
   }
 };
 
-export const POST_Content_Episodes = async (obj: ContentDTO_EpisodeDTO) => {
+export const PUT_Content = async (obj: Content) => {
   try {
-    const response = await axios.post(`${url_base}/content/season`, obj);
+    const response = await axios.put(`${url_base}/content`, obj);
+    return { success: true, data: response.data };
+  } catch (error: unknown) {
+    let message = "Error desconocido";
+    if (axios.isAxiosError(error)) {
+      message = error.response?.data?.error || message;
+    }
+    return { success: false, error: message };
+  }
+};
+
+export const Delete_Content = async (id: number) => {
+  try {
+    const response = await axios.delete(`${url_base}/content/${id}`);
     return { success: true, data: response.data };
   } catch (error: unknown) {
     let message = "Error desconocido";

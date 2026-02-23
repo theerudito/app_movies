@@ -255,12 +255,12 @@ func GetContentSeasonId(c *fiber.Ctx) error {
 func GetFindContent(c *fiber.Ctx) error {
 
 	var (
-		obj     []dto.ContentDTO
-		content dto.ContentDTO
-		id      = c.Params("type")
-		conn    = db.GetDB()
-		rows    *sql.Rows
-		err     error
+		obj []dto.ContentDTO
+
+		id   = c.Params("type")
+		conn = db.GetDB()
+		rows *sql.Rows
+		err  error
 	)
 
 	value := helpers.QuitarGuiones(c.Params("value"))
@@ -293,6 +293,7 @@ func GetFindContent(c *fiber.Ctx) error {
 	defer rows.Close()
 
 	for rows.Next() {
+		var content dto.ContentDTO
 		err = rows.Scan(
 			&content.ContentId,
 			&content.Title,

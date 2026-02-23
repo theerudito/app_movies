@@ -3,14 +3,12 @@ import { useContent } from "../store/useContent";
 import "../styles/Styles_Content.css";
 import { usePlayer } from "../store/usePlayer";
 import { Component_Player } from "./Component_Player";
-
+import { GET_Contents } from "../helpers/Fetching_Content";
 
 export const Component_Content = () => {
   const { open_player, playing } = usePlayer((state) => state);
   const [selectedSeasonIndex, setSelectedSeasonIndex] = useState(0);
-  const { getContent_full, list_full_data } = useContent(
-    (state) => state
-  );
+  const { getContents } = useContent((state) => state);
 
   const handleChangeSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const index = parseInt(e.target.value, 10);
@@ -18,8 +16,8 @@ export const Component_Content = () => {
   };
 
   useEffect(() => {
-    getContent_full();
-  }, [getContent_full]);
+    GET_Contents(1);
+  }, [GET_Contents(1)]);
 
   return (
     <div className="anime-viewer">
@@ -60,7 +58,7 @@ export const Component_Content = () => {
                     </div>
                     <p className="episode-title">{item.episode_name}</p>
                   </div>
-                )
+                ),
               )}
             </div>
           </div>
@@ -72,4 +70,4 @@ export const Component_Content = () => {
       )}
     </div>
   );
-}
+};

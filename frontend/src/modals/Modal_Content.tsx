@@ -6,7 +6,16 @@ import { Content } from "../models/Contents";
 
 export const Modal_Content = () => {
   const { currentModal, OpenModal, CloseModal } = useModal((state) => state);
-  const { gender_list, getGender, year_list, getYear, type_list, getType } = useData((state) => state);
+  const {
+    gender_list,
+    getGender,
+    year_list,
+    getYear,
+    type_list,
+    getType,
+    season_list,
+    getSeason,
+  } = useData((state) => state);
   const { form_content, postContent } = useContent((state) => state);
 
   const handleChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,40 +52,53 @@ export const Modal_Content = () => {
   };
 
   useEffect(() => {
-    getGender()
-    getYear()
-    getType()
-  }, [getGender, getYear, getType])
-
+    getGender();
+    getYear();
+    getType();
+    getSeason();
+  }, [getGender, getYear, getType, getSeason]);
 
   const sendData = () => {
-
-    if (form_content.content_type === 0 || form_content.gender_id === 0) {
+    if (
+      form_content.type === 0 ||
+      form_content.gender_id === 0 ||
+      form_content.season_id === 0
+    ) {
       alert("Debes seleccionar un genero y tipo de contenido");
       return;
     }
 
-    const { content_title, content_cover, content_type, content_year, gender_id } = form_content
+    const { title, url_cover, type, year, gender_id, season_id } = form_content;
 
     const currentYear = new Date().getFullYear();
 
     const obj: Content = {
       content_id: 0,
-      content_title,
-      content_cover,
-      content_type: Number(content_type),
-      content_year: content_year === 0 ? currentYear : content_year,
-      gender_id: gender_id === 0 ? 1 : gender_id
+      title,
+      url_cover,
+      type: Number(type),
+      year: year === 0 ? currentYear : Number(year),
+      gender_id: Number(gender_id) === 0 ? 1 : Number(gender_id),
+      season_id: Number(season_id) === 0 ? 1 : Number(season_id),
+      episodes: [
+        {
+          episode_id: 0,
+          name: "CAPITULO 1",
+          number: 1,
+          url_video:
+            "https://la.movie/wp-content/uploads/thumbs/0d28895f2d9dec4614559206fc9f36bc_hd.webp",
+          season_id,
+          content_id: 0,
+        },
+      ],
     };
 
     postContent(obj);
-  }
+  };
 
   return (
     <div>
-      {
-        currentModal === "content" &&
-
+      {currentModal === "content" && (
         <div className="container_modal">
           <div className="container-modal-body">
             <div className="container-modal-header">
@@ -84,67 +106,73 @@ export const Modal_Content = () => {
               <i className="bi bi-x-lg" onClick={() => CloseModal()}></i>
             </div>
             <div className="container-modal-input">
-
               <input
                 className="input"
                 type="text"
-                name="content_title"
-                value={form_content.content_title}
+                name="title"
+                value={form_content.title}
                 onChange={handleChangeInput}
                 placeholder="TITULO"
               />
 
-              <select name="content_type" onChange={handleChangeSelect}>
+              <select name="type" onChange={handleChangeSelect}>
                 <option value="0">SELECIONA UN TIPO CONTENIDO</option>
-                {
-                  type_list.map((item) => (
-                    <option key={item.content_type} value={item.content_type}>{item.content_type_title}</option>
-                  ))
-                }
+                {type_list.map((item) => (
+                  <option key={item.content_type} value={item.content_type}>
+                    {item.content_type_title}
+                  </option>
+                ))}
+              </select>
+
+              <select name="season_id" onChange={handleChangeSelect}>
+                <option value="0">SELECIONA UNA TEMPORADA</option>
+                {season_list.map((item) => (
+                  <option key={item.season_id} value={item.season_id}>
+                    {item.season_name}
+                  </option>
+                ))}
               </select>
 
               <input
                 className="input"
                 type="text"
-                name="content_cover"
-                value={form_content.content_cover}
+                name="url_cover"
+                value={form_content.url_cover}
                 onChange={handleChangeInput}
                 placeholder="URL IMAGEN"
               />
 
-              <select name="content_year" onChange={handleChangeSelect}>
+              <select name="year" onChange={handleChangeSelect}>
                 <option value="0">SELECIONA UN AÑO</option>
-                {
-                  year_list.map((item) => (
-                    <option key={item.year_id} value={item.year}>{item.year}</option>
-                  ))
-                }
+                {year_list.map((item) => (
+                  <option key={item.year_id} value={item.year}>
+                    {item.year}
+                  </option>
+                ))}
               </select>
 
               <div className="contenedor_select">
-
                 <select name="gender_id" onChange={handleChangeSelect}>
                   <option value="0">SELECIONA UN GENERO</option>
-                  {
-                    gender_list.map((item) => (
-                      <option key={item.gender_id} value={item.gender_id}>{item.gender_name}</option>
-                    ))
-                  }
+                  {gender_list.map((item) => (
+                    <option key={item.gender_id} value={item.gender_id}>
+                      {item.gender_name}
+                    </option>
+                  ))}
                 </select>
 
                 <div onClick={() => OpenModal("gender")}>
                   <i className="bi bi-plus-circle"></i>
                 </div>
-
               </div>
 
-              <button onClick={() => sendData()}><i className="bi bi-floppy"></i> GUARDAR</button>
-
+              <button onClick={() => sendData()}>
+                <i className="bi bi-floppy"></i> GUARDAR
+              </button>
             </div>
           </div>
         </div>
-      }
-
+      )}
     </div>
-  )
-}
+  );
+};
