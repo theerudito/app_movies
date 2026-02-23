@@ -328,7 +328,7 @@ func PostContent(c *fiber.Ctx) error {
 	)
 
 	if err = c.BodyParser(&content); err != nil {
-		_ = helpers.InsertLogsError(conn, "content", "Error al leer los registros")
+		_ = helpers.InsertLogsError(conn, "content", "Cuerpo de solicitud inválido "+err.Error())
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Cuerpo de solicitud inválido"})
 	}
 
@@ -370,7 +370,8 @@ func PostContent(c *fiber.Ctx) error {
 		INSERT INTO content_type (content_title, content_type, content_year, gender_id, cover_id)
 		VALUES ($1, $2, $3, $4, $5) RETURNING content_id`
 
-	err = tx.QueryRow(qInsertContent,
+	err = tx.QueryRow(
+		qInsertContent,
 		strings.ToUpper(content.Title),
 		typeId,
 		content.Year,
@@ -395,7 +396,8 @@ func PostContent(c *fiber.Ctx) error {
 		INSERT INTO episode (episode_name, episode_number, video_id, season_id, content_id)
 		VALUES ($1, $2, $3, $4, $5)`
 
-		_, err = tx.Exec(qInsertEpisodes,
+		_, err = tx.Exec(
+			qInsertEpisodes,
 			strings.ToUpper(episode.Name),
 			episode.Number,
 			videId,
@@ -435,7 +437,7 @@ func PutContent(c *fiber.Ctx) error {
 	)
 
 	if err = c.BodyParser(&content); err != nil {
-		_ = helpers.InsertLogsError(conn, "content", "Error al leer los registros")
+		_ = helpers.InsertLogsError(conn, "content", "Cuerpo de solicitud inválido")
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Cuerpo de solicitud inválido"})
 	}
 

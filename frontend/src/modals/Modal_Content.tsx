@@ -34,11 +34,11 @@ export const Modal_Content = () => {
     useContent.setState((state) => {
       let selectedValue: string | number = value;
 
-      if (name === "content_year") {
+      if (name === "year") {
         selectedValue = Number(options[selectedIndex].text);
       }
 
-      if (name === "gender_id" || name === "content_type") {
+      if (name === "gender_id" || name === "type" || name === "season_id") {
         selectedValue = Number(value);
       }
 
@@ -87,7 +87,7 @@ export const Modal_Content = () => {
           number: 1,
           url_video:
             "https://la.movie/wp-content/uploads/thumbs/0d28895f2d9dec4614559206fc9f36bc_hd.webp",
-          season_id,
+          season_id: 0,
           content_id: 0,
         },
       ],

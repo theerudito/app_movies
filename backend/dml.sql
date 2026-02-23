@@ -1,6 +1,6 @@
 INSERT
 INTO Login (username, password)
-VALUES ('THE BOSS',
+VALUES ('BOSS',
         'o0XiGAcpJHHZB88iSma6Bvpxt8hmwmUxtwtpljK/+jWhZg==');
 
 INSERT

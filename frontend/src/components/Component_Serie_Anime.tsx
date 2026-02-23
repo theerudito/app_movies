@@ -7,14 +7,14 @@ import { Component_Content } from "./Component_Content";
 import { Component_Search } from "./Component_Search";
 
 export const Component_Serie_Anime = () => {
-  const { getContents, list_contents, openContent } = useContent(
-    (state) => state,
-  );
+  const { getContents, list_contents, openContent, type_content, changeType } =
+    useContent((state) => state);
   const { isLogin } = useAuth((state) => state);
 
   useEffect(() => {
-    getContents(1);
-  }, [getContents]);
+    changeType(type_content);
+    getContents();
+  }, [getContents, changeType, type_content]);
 
   return (
     <div className="app-container">

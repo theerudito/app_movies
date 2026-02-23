@@ -25,7 +25,7 @@ type Data = {
   // FUNCIONES
   openContent_Type: (open: boolean, id: number) => void;
   changeType: (type: number) => void;
-  getContents: (type: number) => void;
+  getContents: () => void;
   getContent: (id: number) => void;
   getContent_Season_Episode: (id: number, seasonid: number) => void;
   findContent: (type: number, value: string) => void;
@@ -62,13 +62,13 @@ export const useContent = create<Data>((set, get) => ({
   },
 
   changeType: (type) => {
-    set({ type_content: type });
+    set({ type_content: Number(type) });
   },
 
-  getContents: async (type) => {
+  getContents: async () => {
     set({ loading: true });
 
-    const result = await GET_Contents(type);
+    const result = await GET_Contents(get().type_content);
 
     if (result.success && Array.isArray(result.data)) {
       set({ list_contents: result.data });
@@ -80,13 +80,11 @@ export const useContent = create<Data>((set, get) => ({
   },
 
   postContent: async (obj) => {
-    console.log(obj);
-
     const result = await POST_Content(obj);
 
     if (result.success) {
       get().reset();
-      await get().getContent(1);
+      await get().getContents();
       return result.data;
     }
 
