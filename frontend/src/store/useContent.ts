@@ -7,7 +7,11 @@ import {
   ContentFullDTO,
   SeasonEpisodeDTO,
 } from "../models/Contents";
-import { GET_Contents, POST_Content } from "../helpers/Fetching_Content";
+import {
+  GET_Content,
+  GET_Contents,
+  POST_Content,
+} from "../helpers/Fetching_Content";
 
 type Data = {
   // LISTADOS
@@ -79,6 +83,20 @@ export const useContent = create<Data>((set, get) => ({
     set({ loading: false });
   },
 
+  getContent: async (id: number) => {
+    set({ loading: true });
+
+    const result = await GET_Content(id);
+
+    if (result.success && result.data) {
+      set({ list_content: result.data });
+    } else {
+      set({ list_content: null });
+    }
+
+    set({ loading: false });
+  },
+
   postContent: async (obj) => {
     const result = await POST_Content(obj);
 
@@ -91,7 +109,6 @@ export const useContent = create<Data>((set, get) => ({
     return result.error;
   },
 
-  getContent: async () => {},
   getContent_Season_Episode: async () => {},
   findContent: async () => {},
   putContent: async () => {},

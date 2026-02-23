@@ -66,5 +66,5 @@ export interface SeasonEpisodeDTO {
   number: number;
   name: string;
   storage_id: number;
-  url_video: number;
+  url_video: string;
 }

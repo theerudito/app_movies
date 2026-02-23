@@ -3,12 +3,13 @@ import { useContent } from "../store/useContent";
 import "../styles/Styles_Content.css";
 import { usePlayer } from "../store/usePlayer";
 import { Component_Player } from "./Component_Player";
-import { GET_Contents } from "../helpers/Fetching_Content";
+import { useParams } from "react-router-dom";
 
 export const Component_Content = () => {
   const { open_player, playing } = usePlayer((state) => state);
   const [selectedSeasonIndex, setSelectedSeasonIndex] = useState(0);
-  const { getContents } = useContent((state) => state);
+  const { getContent, list_content } = useContent((state) => state);
+  const { id } = useParams<{ id: string }>();
 
   const handleChangeSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const index = parseInt(e.target.value, 10);
@@ -16,8 +17,8 @@ export const Component_Content = () => {
   };
 
   useEffect(() => {
-    GET_Contents(1);
-  }, [GET_Contents(1)]);
+    getContent(Number(id));
+  }, [getContent, id]);
 
   return (
     <div className="anime-viewer">
@@ -25,16 +26,16 @@ export const Component_Content = () => {
         <>
           <div className="anime-main">
             <div className="anime-image">
-              <img src={list_full_data?.content.content_cover} />
+              <img src={list_content?.content.url_cover} />
             </div>
 
             <div className="anime-info">
-              <h5>{list_full_data?.content.content_title}</h5>
-              <p>{list_full_data?.content.content_year}</p>
-              <p>{list_full_data?.content.content_gender}</p>
+              <h5>{list_content?.content.title}</h5>
+              <p>{list_content?.content.year}</p>
+              <p>{list_content?.content.gender}</p>
               <select onChange={handleChangeSelect}>
-                {list_full_data?.seasons.map((season, index) => (
-                  <option key={season.season_id} value={index}>
+                {list_content?.seasons.map((season, index) => (
+                  <option key={index} value={season.season_id}>
                     {season.season_name}
                   </option>
                 ))}
@@ -44,19 +45,19 @@ export const Component_Content = () => {
 
           <div className="episode-scroll">
             <div className="episode-grid">
-              {list_full_data?.seasons[selectedSeasonIndex].episodes.map(
-                (item, index) => (
-                  <div key={index} className="episode">
+              {list_content?.seasons[selectedSeasonIndex].episodes.map(
+                (item, key) => (
+                  <div key={key} className="episode">
                     <div className="episode-image">
-                      <img src={list_full_data?.content.content_cover} />
+                      <img src={list_content?.content.url_cover} />
                       <div className="play-button">
                         <i
                           className="bi bi-play-circle"
-                          onClick={() => open_player(item.episode_url)}
+                          onClick={() => open_player(item.url_video)}
                         ></i>
                       </div>
                     </div>
-                    <p className="episode-title">{item.episode_name}</p>
+                    <p className="episode-title">{item.name}</p>
                   </div>
                 ),
               )}

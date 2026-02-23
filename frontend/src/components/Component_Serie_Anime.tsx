@@ -5,11 +5,20 @@ import cover from "../assets/logo.webp";
 import { useAuth } from "../store/useAuth";
 import { Component_Content } from "./Component_Content";
 import { Component_Search } from "./Component_Search";
+import { useNavigate } from "react-router-dom";
 
 export const Component_Serie_Anime = () => {
   const { getContents, list_contents, openContent, type_content, changeType } =
     useContent((state) => state);
   const { isLogin } = useAuth((state) => state);
+  const nav = useNavigate();
+
+  const OpenContent = (id: number) => {
+    if (id > 0) {
+      nav(`/content/${id}`);
+    }
+    return;
+  };
 
   useEffect(() => {
     changeType(type_content);
@@ -36,7 +45,10 @@ export const Component_Serie_Anime = () => {
                     <div className="card-overlay">
                       <p className="card-year">{item.year}</p>
                       <div className="card-play">
-                        <i className="bi bi-play-circle"></i>
+                        <i
+                          className="bi bi-play-circle"
+                          onClick={() => OpenContent(item.content_id)}
+                        ></i>
                       </div>
                       <div className="card-container-button">
                         {isLogin && (

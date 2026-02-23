@@ -19,7 +19,7 @@ function App() {
             <Route path="/peliculas" element={<Component_Movie />} />
             <Route path="/series" element={<Component_Serie_Anime />} />
             <Route path="/animes" element={<Component_Serie_Anime />} />
-            <Route path="/content" element={<Component_Content />} />
+            <Route path="/content/:id" element={<Component_Content />} />
 
             <Route path="*" element={<Component_NotFound />} />
           </Routes>
