@@ -1,26 +1,26 @@
 export interface Movies {
   movie_id: number;
-  movie_title: string;
-  movie_year: number;
-  movie_cover: string;
-  movie_url: string;
+  title: string;
+  year: number;
+  url_cover: string;
+  url_video: string;
   gender_id: number;
 }
 
 export interface MoviesDTO {
   movie_id: number;
-  movie_title: string;
-  movie_year: number;
-  movie_cover: string;
-  movie_url: string;
-  movie_gender: string;
+  title: string;
+  year: number;
+  url_cover: string;
+  url_video: string;
+  gender: string;
 }
 
 export const _movies: Movies = {
   movie_id: 0,
-  movie_title: "",
-  movie_year: 0,
-  movie_cover: "",
-  movie_url: "",
+  title: "",
+  year: 0,
+  url_cover: "",
+  url_video: "",
   gender_id: 0,
 };

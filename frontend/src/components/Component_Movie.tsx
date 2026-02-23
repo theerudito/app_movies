@@ -28,17 +28,17 @@ export const Component_Movie = () => {
                 {list_movies.map((item) => (
                   <div key={item.movie_id} className="container-card">
                     <img
-                      src={item.movie_cover === "" ? cover : item.movie_cover}
+                      src={item.url_cover === "" ? cover : item.url_cover}
                       alt={cover}
                       className="card-background-image"
                     />
 
                     <div className="card-overlay">
-                      <p className="card-year">{item.movie_year}</p>
+                      <p className="card-year">{item.year}</p>
                       <div className="card-play">
                         <i
                           className="bi bi-play-circle"
-                          onClick={() => open_player(item.movie_url)}
+                          onClick={() => open_player(item.url_video)}
                         ></i>
                       </div>
 
