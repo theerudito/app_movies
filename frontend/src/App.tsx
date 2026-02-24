@@ -6,6 +6,7 @@ import { Component_NotFound } from "./components/Component_NotFound";
 import { Component_Movie } from "./components/Component_Movie";
 import { Component_Serie_Anime } from "./components/Component_Serie_Anime";
 import { Component_Content } from "./components/Component_Content";
+import { Component_Player } from "./components/Component_Player";
 import "../src/styles/App.css";
 
 function App() {
@@ -20,7 +21,7 @@ function App() {
             <Route path="/series" element={<Component_Serie_Anime />} />
             <Route path="/animes" element={<Component_Serie_Anime />} />
             <Route path="/content/:id" element={<Component_Content />} />
-
+            <Route path="/video" element={<Component_Player />} />
             <Route path="*" element={<Component_NotFound />} />
           </Routes>
           <Component_Footer />

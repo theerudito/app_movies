@@ -1,30 +1,31 @@
 import { create } from "zustand";
 
-type Data = {
+type PlayerStore = {
   url: string;
   playing: boolean;
   open_player: (url: string) => void;
   close_player: () => void;
+  reset: () => void;
 };
 
-export const usePlayer = create<Data>((set) => ({
+export const usePlayer = create<PlayerStore>((set) => ({
   url: "",
   playing: false,
 
   open_player: (url: string) =>
-    set(() => ({
+    set({
       url,
       playing: true,
-    })),
+    }),
 
   close_player: () =>
-    set(() => ({
+    set({
       playing: false,
-    })),
+    }),
 
   reset: () =>
-    set(() => ({
+    set({
       url: "",
       playing: false,
-    })),
+    }),
 }));

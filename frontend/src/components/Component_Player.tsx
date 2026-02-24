@@ -1,43 +1,41 @@
 import ReactPlayer from "react-player";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "../styles/Styles_Player.css";
 import { usePlayer } from "../store/usePlayer";
-import { useEffect } from "react";
-
 
 export const Component_Player = () => {
-  const { close_player, url } = usePlayer((state) => state);
+  const { url, playing, reset } = usePlayer();
+  const nav = useNavigate();
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      const video = document.querySelector("video");
-      if (video) {
-        video.setAttribute("controlsList", "nodownload");
-        clearInterval(interval);
-      }
-    }, 100);
+    if (!url) {
+      nav("/");
+    }
+  }, [url, nav]);
 
-    return () => clearInterval(interval);
-  }, []);
+  const handleClose = () => {
+    reset();
+    nav("/");
+  };
 
-  if (url === "") return null;
-
-
+  if (!url || !playing) {
+    return <div>No hay video seleccionado</div>;
+  }
 
   return (
     <div className="container-player-body">
-      <button className="close-button" onClick={close_player}>
+      <button className="close-button" onClick={handleClose}>
         <i className="bi bi-x-lg"></i>
       </button>
 
       <ReactPlayer
         url={url}
-        playing={true}
-        controls={true}
+        playing={playing}
+        controls
         width="100%"
         height="100%"
-        className="react-player"
       />
     </div>
-
   );
 };
