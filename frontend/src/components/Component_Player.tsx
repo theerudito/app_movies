@@ -23,14 +23,17 @@ export const Component_Player = () => {
   }
 
   return (
-    <div className="container-player-body">
-      <button className="close-button" onClick={handleClose}>
+    <div className="container-player-body fixed top-0 left-0 right-0 bottom-0 bg-black z-50">
+      <button
+        className="close-button absolute top-4 right-4 bg-gray-700 text-white p-2 rounded-full hover:bg-gray-800 transition"
+        onClick={handleClose}
+      >
         <i className="bi bi-x-lg"></i>
       </button>
 
       <ReactPlayer
         url={url}
-        playing={playing}
+        playing={true}
         controls
         width="100%"
         height="100%"

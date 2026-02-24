@@ -1,4 +1,3 @@
-// Component_Header.tsx
 import { useContent } from "../store/useContent";
 import { useModal } from "../store/useModal";
 import { Link } from "react-router-dom";
@@ -16,7 +15,6 @@ export const Component_Header = () => {
 
   return (
     <div className="flex flex-col lg:flex-row">
-      {/* Barra lateral */}
       <div className="fixed top-0 left-0 w-64 bg-gray-900 text-white h-full p-6">
         <div className="space-y-6">
           <Link
@@ -58,10 +56,10 @@ export const Component_Header = () => {
 
         {/* Botones de acción */}
         <div className="mt-5 flex flex-col space-y-4">
-          <span className="block py-2 text-lg text-white">Añadir Película</span>
-          <span className="block py-2 text-lg text-white">Añadir Anime</span>
-          <span className="block py-2 text-lg text-white">Añadir Serie</span>
-          <span className="block py-2 text-lg text-white">Login</span>
+          <i className="bi bi-camera-reels"></i>
+          <i className="bi bi-film"></i>
+          <i className="bi bi-camera-video"></i>
+          <i className="bi bi-person"></i>
         </div>
       </div>
 
