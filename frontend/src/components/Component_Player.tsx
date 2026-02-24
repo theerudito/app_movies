@@ -1,7 +1,6 @@
 import ReactPlayer from "react-player";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles/Styles_Player.css";
 import { usePlayer } from "../store/usePlayer";
 
 export const Component_Player = () => {

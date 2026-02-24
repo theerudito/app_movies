@@ -1,14 +1,13 @@
-import { Modal_Movie } from "../modals/Modal_Movie";
+// Component_Header.tsx
 import { useContent } from "../store/useContent";
 import { useModal } from "../store/useModal";
-import "../styles/Styles_Header.css";
 import { Link } from "react-router-dom";
-import { Modal_Content } from "../modals/Modal_Content";
-import { Modal_Login } from "../modals/Modal_Login";
-import { Modal_Season } from "../modals/Modal_Season";
-import { Modal_Gender } from "../modals/Modal_Gender";
 import { useAuth } from "../store/useAuth";
 import { usePlayer } from "../store/usePlayer";
+import { CameraIcon } from "@heroicons/react/24/solid";
+import { FilmIcon } from "@heroicons/react/24/outline";
+import { UserIcon } from "@heroicons/react/24/outline";
+import { CheckIcon } from "@heroicons/react/24/outline";
 
 export const Component_Header = () => {
   const { changeType, openContent_Type } = useContent((state) => state);
@@ -16,13 +15,20 @@ export const Component_Header = () => {
   const { OpenModal } = useModal((state) => state);
 
   return (
-    <>
-      <div className="container-header-header">
-        <nav className="container-header-nav-links">
-          <Link to="/">Inicio</Link>
+    <div className="flex flex-col lg:flex-row">
+      {/* Barra lateral */}
+      <div className="fixed top-0 left-0 w-64 bg-gray-900 text-white h-full p-6">
+        <div className="space-y-6">
+          <Link
+            to="/"
+            className="block py-2 px-4 text-lg hover:text-purple-500"
+          >
+            Inicio
+          </Link>
           <Link
             to="/peliculas"
             onClick={() => usePlayer.setState({ playing: false })}
+            className="block py-2 px-4 text-lg hover:text-purple-500"
           >
             Películas
           </Link>
@@ -33,6 +39,7 @@ export const Component_Header = () => {
               openContent_Type(false, 0);
               usePlayer.setState({ playing: false });
             }}
+            className="block py-2 px-4 text-lg hover:text-purple-500"
           >
             Series
           </Link>
@@ -43,37 +50,46 @@ export const Component_Header = () => {
               openContent_Type(false, 0);
               usePlayer.setState({ playing: false });
             }}
+            className="block py-2 px-4 text-lg hover:text-purple-500"
           >
             Anime
           </Link>
-        </nav>
+        </div>
 
-        <div className="container-header-buttons" style={{ color: "white" }}>
-          <div onClick={() => OpenModal("movie")}>
-            <i className="bi bi-camera-reels"></i>
+        {/* Botones de acción */}
+        <div className="mt-5 flex flex-col space-y-4">
+          <span className="block py-2 text-lg text-white">Añadir Película</span>
+          <span className="block py-2 text-lg text-white">Añadir Anime</span>
+          <span className="block py-2 text-lg text-white">Añadir Serie</span>
+          <span className="block py-2 text-lg text-white">Login</span>
+        </div>
+      </div>
+
+      {/* Barra superior (el header) */}
+      <div className="fixed top-0 left-0 w-full bg-gray-900 text-white z-50 shadow-lg">
+        {/* Titulo o marca */}
+
+        {/* Iconos de acción */}
+        <div className="flex space-x-4">
+          <div onClick={() => OpenModal("movie")} className="cursor-pointer">
+            <CameraIcon className="text-xl hover:text-purple-500" />
           </div>
 
-          <div onClick={() => OpenModal("content")}>
-            <i className="bi bi-film"></i>
+          <div onClick={() => OpenModal("content")} className="cursor-pointer">
+            <FilmIcon className="text-xl hover:text-purple-500" />
           </div>
 
           {isLogin === false ? (
-            <div onClick={() => OpenModal("login")}>
-              <i className="bi bi-person-fill"></i>
+            <div onClick={() => OpenModal("login")} className="cursor-pointer">
+              <UserIcon className="text-xl hover:text-purple-500" />
             </div>
           ) : (
-            <div>
-              <i className="bi bi-person-fill-check"></i>
+            <div className="cursor-pointer">
+              <CheckIcon className="text-xl" />
             </div>
           )}
         </div>
       </div>
-
-      <Modal_Content />
-      <Modal_Movie />
-      <Modal_Login />
-      <Modal_Season />
-      <Modal_Gender />
-    </>
+    </div>
   );
 };

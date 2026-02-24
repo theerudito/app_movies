@@ -1,4 +1,3 @@
-import "../styles/Styles_Modal.css";
 import { useModal } from "../store/useModal";
 import { useMovies } from "../store/useMovies";
 import { useData } from "../store/useData";

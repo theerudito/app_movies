@@ -7,15 +7,15 @@ import { Component_Movie } from "./components/Component_Movie";
 import { Component_Serie_Anime } from "./components/Component_Serie_Anime";
 import { Component_Content } from "./components/Component_Content";
 import { Component_Player } from "./components/Component_Player";
-import "../src/styles/App.css";
+import { Layout } from "./components/Componet_Layout";
 
 function App() {
   return (
     <>
-      <div>
-        <BrowserRouter>
-          <Component_Header />
-          <Routes>
+      <BrowserRouter>
+        <Component_Header />
+        <Routes>
+          <Route path="/" element={<Layout />}>
             <Route path="/" element={<Component_Home />} />
             <Route path="/peliculas" element={<Component_Movie />} />
             <Route path="/series" element={<Component_Serie_Anime />} />
@@ -23,10 +23,10 @@ function App() {
             <Route path="/content/:id" element={<Component_Content />} />
             <Route path="/video" element={<Component_Player />} />
             <Route path="*" element={<Component_NotFound />} />
-          </Routes>
-          <Component_Footer />
-        </BrowserRouter>
-      </div>
+          </Route>
+        </Routes>
+        <Component_Footer />
+      </BrowserRouter>
     </>
   );
 }

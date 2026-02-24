@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useMovies } from "../store/useMovies";
 import cover from "../assets/logo.webp";
-import "../styles/Styles_Serie_Anime_Movies.css";
 import { useAuth } from "../store/useAuth";
 import { Component_Search } from "./Component_Search";
 import { useNavigate } from "react-router-dom";

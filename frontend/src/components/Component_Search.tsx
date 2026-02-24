@@ -1,6 +1,5 @@
-import React from 'react'
-import { useMovies } from '../store/useMovies';
-import "../styles/Styles_Seaching.css";
+import React from "react";
+import { useMovies } from "../store/useMovies";
 
 export const Component_Search = () => {
   const { searhMovie, findMovies } = useMovies((state) => state);
@@ -18,9 +17,12 @@ export const Component_Search = () => {
         value={searhMovie}
         onChange={handleChangeInput}
       />
-      <button className="container-header-search-btn" onClick={() => findMovies(searhMovie)}>
+      <button
+        className="container-header-search-btn"
+        onClick={() => findMovies(searhMovie)}
+      >
         <i className="bi bi-search"></i>
       </button>
     </div>
-  )
-}
+  );
+};

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useContent } from "../store/useContent";
-import "../styles/Styles_Content.css";
 import { useParams } from "react-router-dom";
 
 export const Component_Content = () => {
