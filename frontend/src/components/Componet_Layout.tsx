@@ -1,20 +1,17 @@
 import { Outlet } from "react-router-dom";
 import { Component_Header } from "./Component_Header";
+import { Component_Footer } from "./Component_Footer";
 
 export const Layout = () => {
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex overflow-hidden h-screen">
       <Component_Header />
 
-      <main className="grow flex">
-        <div className="flex w-full">
-          <div className=" bg-gray-800 text-white  overflow-y-auto"></div>
-
-          <div className="flex-1 bg-gray-900 text-white p-6 overflow-y-auto">
-            <Outlet />
-          </div>
-        </div>
+      <main className="w-full mb-10 min-h-screen overflow-y-auto bg-gray-950 p-4">
+        <Outlet />
       </main>
+
+      <Component_Footer />
     </div>
   );
 };

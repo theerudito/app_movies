@@ -1,7 +1,5 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Component_Home } from "./components/Component_Home";
-import { Component_Header } from "./components/Component_Header";
-import { Component_Footer } from "./components/Component_Footer";
 import { Component_NotFound } from "./components/Component_NotFound";
 import { Component_Movie } from "./components/Component_Movie";
 import { Component_Serie_Anime } from "./components/Component_Serie_Anime";
@@ -13,7 +11,6 @@ function App() {
   return (
     <>
       <BrowserRouter>
-        <Component_Header />
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route path="/" element={<Component_Home />} />
@@ -25,7 +22,6 @@ function App() {
             <Route path="*" element={<Component_NotFound />} />
           </Route>
         </Routes>
-        <Component_Footer />
       </BrowserRouter>
     </>
   );

@@ -10,7 +10,7 @@ export const Component_Serie_Anime = () => {
     (state) => state,
   );
 
-  //const nav = useNavigate();
+  // const nav = useNavigate();
 
   // const OpenContent = (id: number) => {
   //   if (id > 0) {
@@ -29,7 +29,7 @@ export const Component_Serie_Anime = () => {
       <Component_Search />
 
       <div className="container mx-auto p-6">
-        <p className="text-3xl font-bold mb-2">Últimas Series</p>
+        <p className="text text-3xl font-bold mb-2">Últimas Series</p>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8">
           {list_contents.map((item) => (
             <div key={item.content_id} className="relative group">

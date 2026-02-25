@@ -3,7 +3,6 @@ import { useMovies } from "../store/useMovies";
 import { useContent } from "../store/useContent";
 import cover from "../assets/logo.webp";
 import { useNavigate } from "react-router-dom";
-import { Component_Footer } from "./Component_Footer";
 
 export const Component_Home = () => {
   const { list_movies, getMovies } = useMovies((state) => state);
@@ -22,9 +21,9 @@ export const Component_Home = () => {
 
   return (
     <div className="flex flex-col space-y-0">
-      <div className="container mx-auto p-6">
-        <p className="text-2xl font-bold mb-1">Últimas Películas</p>
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-8">
+      <div className="container mx-4 py-2">
+        <p className="text text-2xl font-bold mb-1">Últimas Películas</p>
+        <div className="flex flex-wrap gap-4 w-fit justify-center bg-gray-900 p-4 rounded-2xl">
           {list_movies.map((item) => (
             <div key={item.movie_id} className="relative group">
               <img
@@ -48,8 +47,8 @@ export const Component_Home = () => {
         </div>
       </div>
 
-      <div className="container mx-auto p-6">
-        <p className="text-3xl font-bold mb-2">Últimas Series</p>
+      <div className="container mx-4 py-2">
+        <p className="text text-3xl font-bold mb-2">Últimas Series</p>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8">
           {list_contents.map((item) => (
             <div key={item.content_id} className="relative group">
@@ -71,8 +70,8 @@ export const Component_Home = () => {
         </div>
       </div>
 
-      <div className="container mx-auto p-6">
-        <p className="text-3xl font-bold mb-2">Últimas Anime</p>
+      <div className="container mx-4 py-2">
+        <p className="text text-3xl font-bold mb-2">Últimas Anime</p>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8">
           {list_contents.map((item) => (
             <div key={item.content_id} className="relative group">
@@ -96,5 +95,3 @@ export const Component_Home = () => {
     </div>
   );
 };
-
-<Component_Footer />;

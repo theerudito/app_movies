@@ -28,7 +28,7 @@ export const Component_Movie = () => {
         <Component_Search />
 
         <div className="container mx-auto p-6">
-          <p className="text-2xl font-bold mb-1">Últimas Películas</p>
+          <p className="text text-2xl font-bold mb-1">Últimas Películas</p>
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-8">
             {list_movies.map((item) => (
               <div key={item.movie_id} className="relative group">
