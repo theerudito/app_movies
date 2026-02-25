@@ -53,7 +53,7 @@ export const Component_Header = () => {
       {/* Logout Button at the Bottom */}
       <div className="mt-auto mb-4 flex justify-center w-full">
         <Link
-          to="/logout"
+          to="/"
           className="flex items-center justify-center py-2 px-2 sm:py-4 sm:px-6 bg-purple-500 rounded-lg hover:bg-purple-600 transition duration-300"
         >
           <UserIcon className="h-6 w-6" />

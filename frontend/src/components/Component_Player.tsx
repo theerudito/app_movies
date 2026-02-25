@@ -28,7 +28,7 @@ export const Component_Player = () => {
         className="close-button absolute top-4 right-4 bg-gray-700 text-white p-2 rounded-full hover:bg-gray-800 transition"
         onClick={handleClose}
       >
-        <i className="bi bi-x-lg"></i>
+        <i className="bi bi-x-lg text-sm text-white bg-gray-700 hover:bg-gray-800 p-2 rounded-full transition-all duration-200 cursor-pointer"></i>
       </button>
 
       <ReactPlayer

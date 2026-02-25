@@ -25,18 +25,18 @@ export const Component_Serie_Anime = () => {
   }, [getContents, changeType, type_content]);
 
   return (
-    <div className="app-container">
+    <>
       <Component_Search />
 
-      <div className="container mx-auto p-6">
-        <p className="text text-3xl font-bold mb-2">Últimas Series</p>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8">
+      <div className="container py-2">
+        <p className="text text-2xl font-bold mb-1">Últimas Series</p>
+        <div className="flex flex-wrap gap-4 w-fit justify-center bg-gray-900 p-4 rounded-2xl">
           {list_contents.map((item) => (
             <div key={item.content_id} className="relative group">
               <img
                 src={item.url_cover === "" ? cover : item.url_cover}
                 alt={item.url_cover || "Cover"}
-                className="w-40 h-60 object-cover rounded-lg"
+                className="w-40 h-60  object-x rounded-lg"
               />
               <div className="absolute top-0 left-0 w-40 h-60 bg-black bg-opacity-50 opacity-0 group-hover:opacity-50 transition-opacity duration-300 ease-in-out rounded-lg flex items-center justify-center">
                 <i className="bi bi-play-circle text-white text-4xl"></i>
@@ -50,6 +50,6 @@ export const Component_Serie_Anime = () => {
           ))}
         </div>
       </div>
-    </div>
+    </>
   );
 };
