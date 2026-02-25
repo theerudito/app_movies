@@ -3,6 +3,7 @@ import { useMovies } from "../store/useMovies";
 import { useContent } from "../store/useContent";
 import cover from "../assets/logo.webp";
 import { useNavigate } from "react-router-dom";
+import { Component_Footer } from "./Component_Footer";
 
 export const Component_Home = () => {
   const { list_movies, getMovies } = useMovies((state) => state);
@@ -95,3 +96,5 @@ export const Component_Home = () => {
     </div>
   );
 };
+
+<Component_Footer />;
