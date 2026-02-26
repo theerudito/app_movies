@@ -55,7 +55,7 @@ export const Component_Home = () => {
                 </span>
               </div>
 
-              {isLogin === false && item.movie_id > 0 && (
+              {isLogin === true && item.movie_id > 0 && (
                 <div className="absolute bottom-2 left-2 right-2 flex justify-between px-1">
                   <i className="bi bi-pencil text-white text-lg cursor-pointer hover:text-purple-400"></i>
                   <i
@@ -87,7 +87,7 @@ export const Component_Home = () => {
                   {item.year}
                 </span>
               </div>
-              {isLogin === false && item.content_id > 0 && (
+              {isLogin === true && item.content_id > 0 && (
                 <div className="absolute bottom-2 left-2 right-2 flex justify-between px-1">
                   <i className="bi bi-pencil text-white text-lg cursor-pointer hover:text-purple-400"></i>
                   <i
@@ -119,7 +119,7 @@ export const Component_Home = () => {
                   {item.year}
                 </span>
               </div>
-              {isLogin === false && item.content_id > 0 && (
+              {isLogin === true && item.content_id > 0 && (
                 <div className="absolute bottom-2 left-2 right-2 flex justify-between px-1">
                   <i className="bi bi-pencil text-white text-lg cursor-pointer hover:text-purple-400"></i>
                   <i

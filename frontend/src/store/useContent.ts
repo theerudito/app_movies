@@ -111,15 +111,13 @@ export const useContent = create<Data>((set, get) => ({
 
     const result = await GET_Content(id);
 
-    console.log(result);
+    if (result.success && result.data) {
+      set({ list_content: result.data });
+    } else {
+      set({ list_serie: Contents_List });
+    }
 
-    // if (result.success && result.data) {
-    //   set({ list_serie: result.data });
-    // } else {
-    //   set({ list_serie: Contents_List });
-    // }
-
-    // set({ loading: false });
+    set({ loading: false });
   },
 
   postContent: async (obj) => {

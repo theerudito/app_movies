@@ -3,7 +3,7 @@ import { useModal } from "../store/useModal";
 
 export const Modal_Login = () => {
   const { currentModal, CloseModal } = useModal((state) => state);
-  const { form_auth, postLogin } = useAuth((state) => state);
+  const { form_auth, Login } = useAuth((state) => state);
 
   const handleChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -17,7 +17,7 @@ export const Modal_Login = () => {
   };
 
   const SendData = async () => {
-    await postLogin(form_auth);
+    await Login(form_auth);
     CloseModal();
   };
 

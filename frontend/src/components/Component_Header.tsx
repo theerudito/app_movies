@@ -5,6 +5,7 @@ import {
   PlayCircleIcon,
   PlayIcon,
   PlusIcon,
+  PowerIcon,
   SparklesIcon,
   Square3Stack3DIcon,
 } from "@heroicons/react/24/solid";
@@ -23,7 +24,7 @@ import { Modal_Serie } from "../modals/Modal_Anime";
 export const Component_Header = () => {
   const { changeType, openContent_Type } = useContent((state) => state);
   const { OpenModal } = useModal((state) => state);
-  const { isLogin } = useAuth((state) => state);
+  const { isLogin, Logout } = useAuth((state) => state);
 
   return (
     <>
@@ -37,7 +38,6 @@ export const Component_Header = () => {
 
         <Link
           to="/peliculas"
-          onClick={() => {}}
           className="flex items-center justify-center sm:py-4 py-4 sm:px-2 px-2 rounded-lg hover:bg-gray-700 transition duration-300"
         >
           <FilmIcon className="h-6 w-6" />
@@ -66,7 +66,7 @@ export const Component_Header = () => {
         </Link>
 
         <div className="mt-auto mb-4 flex flex-col items-center gap-4 w-full">
-          {isLogin === false && (
+          {isLogin === true && (
             <>
               <PlayIcon
                 className="h-9 w-9 rounded-lg hover:bg-gray-700 transition duration-300"
@@ -92,16 +92,18 @@ export const Component_Header = () => {
           )}
         </div>
 
-        <div
-          className="mt-auto mb-4 flex justify-center w-full"
-          onClick={() => OpenModal("login")}
-        >
-          <Link
-            to="/"
-            className="flex items-center justify-center py-2 px-2 sm:py-4 sm:px-6 bg-purple-500 rounded-lg hover:bg-purple-600 transition duration-300"
-          >
-            <UserIcon className="h-6 w-6" />
-          </Link>
+        <div className="mt-auto mb-4 flex justify-center w-full">
+          {isLogin == false ? (
+            <UserIcon
+              onClick={() => OpenModal("login")}
+              className="flex items-center justify-center py-2 px-2 sm:py-4 sm:px-6 bg-purple-500 rounded-lg hover:bg-purple-600 transition duration-300"
+            />
+          ) : (
+            <PowerIcon
+              onClick={() => Logout()}
+              className="flex items-center justify-center py-2 px-2 sm:py-4 sm:px-6 bg-purple-500 rounded-lg hover:bg-purple-600 transition duration-300"
+            />
+          )}
         </div>
       </div>
 
