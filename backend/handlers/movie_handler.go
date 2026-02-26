@@ -397,6 +397,13 @@ func DeleteMovie(c *fiber.Ctx) error {
 
 	defer tx.Rollback()
 
+	dMovie := `DELETE FROM movie WHERE movie_id = $1`
+	_, err = tx.Exec(dMovie, movieID)
+	if err != nil {
+		_ = helpers.InsertLogsError(conn, "movie", "error eliminando el registro "+err.Error())
+		return c.Status(500).JSON(fiber.Map{"message": "error eliminando el registro"})
+	}
+
 	// DELETE COVER
 	_, err = helpers.StorageManager(dto.StorageItemDTO{Option: "DELETE", StorageId: coverID, TX: tx})
 	if err != nil {
@@ -409,13 +416,6 @@ func DeleteMovie(c *fiber.Ctx) error {
 	if err != nil {
 		_ = helpers.InsertLogsError(conn, "storage", "error eliminando el video "+err.Error())
 		return c.Status(500).JSON(fiber.Map{"messaje": "error eliminando el video"})
-	}
-
-	dMovie := `DELETE FROM movie WHERE movie_id = $1`
-	_, err = tx.Exec(dMovie, movieID)
-	if err != nil {
-		_ = helpers.InsertLogsError(conn, "movie", "error eliminando el registro "+err.Error())
-		return c.Status(500).JSON(fiber.Map{"message": "error eliminando el registro"})
 	}
 
 	err = helpers.InsertLogs(tx, "DELETE", "movie", id, "registro eliminado correctamente")
