@@ -17,7 +17,6 @@ export const Modal_Login = () => {
   };
 
   const SendData = async () => {
-    console.log(form_auth);
     await postLogin(form_auth);
     CloseModal();
   };

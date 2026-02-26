@@ -626,6 +626,13 @@ func DeleteContent(c *fiber.Ctx) error {
 		}
 	}
 
+	dEpisodes := `DELETE FROM episode WHERE content_id = $1`
+	_, err = tx.Exec(dEpisodes, id)
+	if err != nil {
+		_ = helpers.InsertLogsError(conn, "episode", "error eliminando el registro "+err.Error())
+		return c.Status(500).JSON(fiber.Map{"message": "error eliminando el registro"})
+	}
+
 	dContent := `DELETE FROM content_type WHERE content_id = $1`
 	_, err = tx.Exec(dContent, id)
 	if err != nil {

@@ -4,14 +4,13 @@ import { useData } from "../store/useData";
 import { useContent } from "../store/useContent";
 import { Content } from "../models/Contents";
 
-export const Modal_Content = () => {
+export const Modal_Serie = () => {
   const { currentModal, OpenModal, CloseModal } = useModal((state) => state);
   const {
     gender_list,
     getGender,
     year_list,
     getYear,
-    type_list,
     getType,
     season_list,
     getSeason,
@@ -68,7 +67,7 @@ export const Modal_Content = () => {
       return;
     }
 
-    const { title, url_cover, type, year, gender_id, season_id } = form_content;
+    const { title, url_cover, year, gender_id, season_id } = form_content;
 
     const currentYear = new Date().getFullYear();
 
@@ -76,7 +75,7 @@ export const Modal_Content = () => {
       content_id: 0,
       title,
       url_cover,
-      type: Number(type),
+      type: 1,
       year: year === 0 ? currentYear : Number(year),
       gender_id: Number(gender_id) === 0 ? 1 : Number(gender_id),
       season_id: Number(season_id) === 0 ? 1 : Number(season_id),
@@ -98,11 +97,11 @@ export const Modal_Content = () => {
 
   return (
     <div>
-      {currentModal === "content" && (
+      {currentModal === "anime" && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
           <div className="w-full max-w-lg bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-6 animate-modalIn">
             <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 pb-3 mb-4 text-lg font-semibold text-gray-800 dark:text-gray-100">
-              <p>AÑADIR SERIE O ANIME</p>
+              <p>AÑADIR ANIME</p>
               <i
                 className="bi bi-x-lg cursor-pointer text-gray-400 hover:text-red-500 transition-colors"
                 onClick={() => CloseModal()}
@@ -118,19 +117,6 @@ export const Modal_Content = () => {
                 placeholder="TITULO"
                 className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
               />
-
-              <select
-                name="type"
-                onChange={handleChangeSelect}
-                className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
-              >
-                <option value="0">SELECCIONA UN TIPO CONTENIDO</option>
-                {type_list.map((item) => (
-                  <option key={item.content_type} value={item.content_type}>
-                    {item.content_type_title}
-                  </option>
-                ))}
-              </select>
 
               <select
                 name="season_id"

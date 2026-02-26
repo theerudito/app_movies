@@ -1,4 +1,5 @@
 import image_1 from "../assets/logo.webp";
+import { ContentDTO } from "../models/Contents";
 import { Episodes } from "../models/Episodes";
 import { MoviesDTO } from "../models/Movies";
 
@@ -13,13 +14,15 @@ export const Movies_List: MoviesDTO[] = [
   },
 ];
 
-export const Contents_List: MoviesDTO[] = [
+export const Contents_List: ContentDTO[] = [
   {
-    movie_id: 1,
+    content_id: 0,
     title: "MAN OF HONOR",
     year: 2000,
     url_cover: image_1,
-    url_video: "https://pixeldrain.com/api/file/kyjhvCUN",
+    type: "as",
+    storage_id: "",
+    gender_id: 1,
     gender: "CRIMEN",
   },
 ];
