@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import { useContent } from "../store/useContent";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { usePlayer } from "../store/usePlayer";
 
 export const Component_Content = () => {
   const [selectedSeasonIndex, setSelectedSeasonIndex] = useState(0);
   const { getContent, list_content } = useContent((state) => state);
+  const { open_player } = usePlayer((state) => state);
   const { id } = useParams<{ id: string }>();
+  const nav = useNavigate();
 
   const handleChangeSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const index = parseInt(e.target.value, 10);
@@ -15,6 +18,12 @@ export const Component_Content = () => {
   useEffect(() => {
     getContent(Number(id));
   }, [getContent, id]);
+
+  const OpenPlayer = (url: string) => {
+    if (!url) return;
+    open_player(url);
+    nav("/video");
+  };
 
   return (
     <div className="anime-viewer">
@@ -62,7 +71,10 @@ export const Component_Content = () => {
                         alt={item.name}
                         className="w-40 h-60 object-cover rounded-lg mx-auto"
                       />
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 hover:opacity-100 transition">
+                      <div
+                        onClick={() => OpenPlayer(item.url_video)}
+                        className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 hover:opacity-100 transition"
+                      >
                         <i className="bi bi-play-circle text-white text-3xl"></i>
                       </div>
                     </div>
