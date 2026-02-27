@@ -42,6 +42,8 @@ func SetupRoutes(app *fiber.App) {
 	v1.Get("/content/:type/find/:value", handlers.GetFindContent)
 	v1.Post("/content", handlers.PostContent)
 	v1.Put("/content", handlers.PutContent)
+	v1.Post("/content/episode", handlers.PostEpisode)
+	v1.Put("/content/episode", handlers.PutEpisode)
 	v1.Delete("/content/:id", handlers.DeleteContent)
 
 	// SEASONS
@@ -55,10 +57,6 @@ func SetupRoutes(app *fiber.App) {
 	v1.Get("/gender/:id", handlers.GetGenderId)
 	v1.Post("/gender", handlers.PostGender)
 	v1.Put("/gender", handlers.PutGender)
-
-	// EPISODES
-	v1.Get("/episode", handlers.GetEpisode)
-	v1.Get("/episode/:id", handlers.GetEpisodeId)
 
 	// LOGIN
 	v1.Post("/login", handlers.PostLogin)
