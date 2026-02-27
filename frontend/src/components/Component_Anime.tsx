@@ -3,11 +3,17 @@ import { useContent } from "../store/useContent";
 import cover from "../assets/logo.webp";
 import { Component_Search } from "./Component_Search";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../store/useAuth";
 
 export const Component_Anime = () => {
-  const { getContentAnime, list_anime, type_content, changeType } = useContent(
-    (state) => state,
-  );
+  const { isLogin } = useAuth((state) => state);
+  const {
+    getContentAnime,
+    list_anime,
+    type_content,
+    changeType,
+    remove_content,
+  } = useContent((state) => state);
 
   const nav = useNavigate();
 
@@ -20,7 +26,7 @@ export const Component_Anime = () => {
 
   useEffect(() => {
     changeType(type_content);
-    getContentAnime();
+    getContentAnime("anime");
   }, [getContentAnime, changeType, type_content]);
 
   return (
@@ -28,7 +34,7 @@ export const Component_Anime = () => {
       <Component_Search />
 
       <div className="container py-2">
-        <p className="text text-2xl font-bold mb-1">Últimas Series</p>
+        <p className="text text-2xl font-bold mb-1">Últimas Anime</p>
         <div className="flex flex-wrap gap-4 w-fit justify-center bg-gray-900 p-4 rounded-2xl">
           {list_anime.map((item) => (
             <div key={item.content_id} className="relative group">
@@ -48,6 +54,15 @@ export const Component_Anime = () => {
                   {item.year}
                 </span>
               </div>
+              {isLogin === true && item.content_id > 0 && (
+                <div className="absolute bottom-2 left-2 right-2 flex justify-between px-1">
+                  <i className="bi bi-pencil text-white text-lg cursor-pointer hover:text-purple-400"></i>
+                  <i
+                    className="bi bi-trash text-white text-lg cursor-pointer hover:text-red-500"
+                    onClick={() => remove_content(item.content_id)}
+                  ></i>
+                </div>
+              )}
             </div>
           ))}
         </div>

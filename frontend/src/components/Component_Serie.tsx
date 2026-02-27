@@ -3,11 +3,17 @@ import { useContent } from "../store/useContent";
 import cover from "../assets/logo.webp";
 import { Component_Search } from "./Component_Search";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../store/useAuth";
 
 export const Component_Serie = () => {
-  const { getContentAnime, list_anime, type_content, changeType } = useContent(
-    (state) => state,
-  );
+  const { isLogin } = useAuth((state) => state);
+  const {
+    getContentAnime,
+    list_anime,
+    type_content,
+    changeType,
+    remove_content,
+  } = useContent((state) => state);
 
   const nav = useNavigate();
 
@@ -20,7 +26,7 @@ export const Component_Serie = () => {
 
   useEffect(() => {
     changeType(type_content);
-    getContentAnime();
+    getContentAnime("anime");
   }, [getContentAnime, changeType, type_content]);
 
   return (
@@ -48,6 +54,15 @@ export const Component_Serie = () => {
                   {item.year}
                 </span>
               </div>
+              {isLogin === true && item.content_id > 0 && (
+                <div className="absolute bottom-2 left-2 right-2 flex justify-between px-1">
+                  <i className="bi bi-pencil text-white text-lg cursor-pointer hover:text-purple-400"></i>
+                  <i
+                    className="bi bi-trash text-white text-lg cursor-pointer hover:text-red-500"
+                    onClick={() => remove_content(item.content_id)}
+                  ></i>
+                </div>
+              )}
             </div>
           ))}
         </div>
