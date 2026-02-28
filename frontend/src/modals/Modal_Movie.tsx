@@ -125,27 +125,42 @@ export const Modal_Movie = () => {
                 className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
               />
 
-              <div className="flex items-center gap-2">
-                <select
-                  name="gender_id"
-                  onChange={handleChangeSelect}
-                  className="flex-1 px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
-                >
-                  <option value="0">SELECCIONA UN GENERO</option>
-                  {gender_list.map((item) => (
-                    <option key={item.gender_id} value={item.gender_id}>
-                      {item.gender_name}
-                    </option>
-                  ))}
-                </select>
+                <div className="flex items-stretch">
 
-                <div
-                  onClick={() => OpenModal("gender")}
-                  className="cursor-pointer text-purple-500 hover:text-purple-600 transition text-xl"
-                >
-                  <i className="bi bi-plus-circle"></i>
+                    <select
+                        name="gender_id"
+                        onChange={handleChangeSelect}
+                        className="flex-1 px-4 py-2
+                   rounded-l-md
+                   border border-gray-300 dark:border-gray-700 border-r-0
+                   bg-white dark:bg-gray-800
+                   text-gray-800 dark:text-gray-100
+                   focus:outline-none focus:ring-2 focus:ring-purple-500
+                   transition"
+                    >
+                        <option value="0">SELECCIONA UN GENERO</option>
+                        {gender_list.map((item) => (
+                            <option key={item.gender_id} value={item.gender_id}>
+                                {item.gender_name}
+                            </option>
+                        ))}
+                    </select>
+
+                    <div
+                        onClick={() => OpenModal("gender")}
+                        className="cursor-pointer
+                   bg-purple-500
+                   px-3 flex items-center justify-center
+                   border-t border-b border-r
+                   border-gray-300 dark:border-gray-700
+                   rounded-r-md
+                   text-white hover:bg-purple-600
+                   transition"
+                    >
+                        <i className="bi bi-plus-circle text-lg"></i>
+                    </div>
+
                 </div>
-              </div>
 
               <button
                 onClick={() => sendData()}

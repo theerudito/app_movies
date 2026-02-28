@@ -144,7 +144,7 @@ export const useContent = create<Data>((set, get) => ({
   remove_content: async (id: number) => {
     const result = await Delete_Content(id);
 
-    if (result.success === true) {
+    if (result.success) {
       await get().getContentAnime;
       await get().getContentSerie;
       return result.data;

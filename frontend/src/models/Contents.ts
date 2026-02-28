@@ -5,8 +5,6 @@ export interface Content {
   url_cover: string;
   year: number;
   gender_id: number;
-  season_id: number;
-  episodes: Episodes[];
 }
 
 export interface Episodes {
@@ -25,17 +23,6 @@ export const _content: Content = {
   url_cover: "",
   year: 0,
   gender_id: 0,
-  season_id: 0,
-  episodes: [
-    {
-      episode_id: 0,
-      number: 1,
-      name: "",
-      url_video: "",
-      season_id: 0,
-      content_id: 0,
-    },
-  ],
 };
 
 export interface ContentDTO {
