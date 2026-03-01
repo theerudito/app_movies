@@ -38,7 +38,8 @@ func GetMovie(c *fiber.Ctx) error {
 		FROM movie AS m
 			INNER JOIN gender AS g ON m.gender_id = g.gender_id
 			INNER JOIN storage AS i ON m.cover_id = i.storage_id
-    		INNER JOIN storage AS v ON m.video_id = v.storage_id`)
+    		INNER JOIN storage AS v ON m.video_id = v.storage_id
+    	ORDER BY m.movie_title`)
 
 	if err != nil {
 		_ = helpers.InsertLogsError(conn, "movie", "Error al ejecutar la consulta")
@@ -159,7 +160,8 @@ func GetFindMovie(c *fiber.Ctx) error {
 			INNER JOIN gender AS g ON m.gender_id = g.gender_id
 			INNER JOIN storage AS i ON m.cover_id = i.storage_id
     		INNER JOIN storage AS v ON m.video_id = v.storage_id
-		WHERE m.movie_title LIKE $1`, search)
+		WHERE m.movie_title LIKE $1
+		ORDER BY  m.movie_id`, search)
 
 	if err != nil {
 		_ = helpers.InsertLogsError(conn, "movie", "Error al ejecutar la consulta")

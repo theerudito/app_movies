@@ -41,7 +41,8 @@ func GetContent(c *fiber.Ctx) error {
 	FROM content_type c
 		INNER JOIN gender AS g ON g.gender_id = c.gender_id
 		INNER JOIN storage AS s ON s.storage_id = c.cover_id
-	WHERE c.content_type = $1`, id)
+	WHERE c.content_type = $1 AND is_complete = true
+	ORDER BY c.content_id`, id)
 
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error al ejecutar la consulta"})
@@ -104,7 +105,7 @@ func GetContentId(c *fiber.Ctx) error {
 		FROM content_type c
 		INNER JOIN gender g ON g.gender_id = c.gender_id
 		INNER JOIN storage s ON s.storage_id = c.cover_id
-		WHERE c.content_id = $1`, id).Scan(
+		WHERE c.content_id = $1 AND is_complete = true`, id).Scan(
 		&content.ContentId,
 		&content.Title,
 		&content.Year,
@@ -219,7 +220,7 @@ func GetContentSeasonId(c *fiber.Ctx) error {
 		s.url
 	FROM episode e
 		INNER JOIN storage AS s ON s.storage_id = e.video_id
-		WHERE e.season_id = $1 AND e.content_id = $2`, seasonId, contendId)
+		WHERE e.season_id = $1 AND e.content_id = $2 `, seasonId, contendId)
 
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error al ejecutar la consulta"})
@@ -283,7 +284,8 @@ func GetFindContent(c *fiber.Ctx) error {
 	FROM content_type c
 		INNER JOIN gender AS g ON g.gender_id = c.gender_id
 		INNER JOIN storage AS s ON s.storage_id = c.cover_id
-	WHERE c.content_title LIKE $1 AND c.content_type = $2`, search, id)
+	WHERE c.content_title LIKE $1 AND c.content_type = $2 AND is_complete = true
+	ORDER BY c.content_id`, search, id)
 
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error al ejecutar la consulta"})

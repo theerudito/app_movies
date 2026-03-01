@@ -1,29 +1,35 @@
 import { create } from "zustand";
-import { _movies, Movies, MoviesDTO } from "../models/Movies";
+import { Movies, MoviesDTO } from "../models/Movies";
 import {
-  DELETE_Movie,
-  GET_Find_Movies,
-  GET_Movies,
-  POST_Movie,
-  PUT_Movie,
+    DELETE_Movie, GET_Find_Movies,
+    GET_Movies,
+    POST_Movie,
+    PUT_Movie,
 } from "../helpers/Fetching_Movies";
 import { Movies_List } from "../helpers/Data";
+import {useModal} from "./useModal.ts";
+
+const initialMovie = (): Movies => ({
+    movie_id: 0,
+    title: "",
+    gender_id: 0,
+    year: 0,
+    url_cover: "",
+    url_video: "",
+});
 
 type Data = {
   // LISTADO
   list_movies: MoviesDTO[];
 
-  // VARABLES
-  searhMovie: string;
+    isEditing: boolean;
 
   // FUNCIONES
   getMovies: () => void;
-  findMovies: (value: string) => void;
-  setSearchMovie: (value: string) => void;
-
-  postMovies: (obj: Movies) => void;
+  getMovie: (obj:MoviesDTO) => void;
+  finMovie: (value:string) => void;
+  sendMovies: (obj: Movies) => void;
   deleteMovies: (id: number) => void;
-  putMovies: (obj: Movies, id: number) => void;
   reset: () => void;
 
   // FORMULARIO
@@ -31,83 +37,89 @@ type Data = {
 };
 
 export const useMovies = create<Data>((set, get) => ({
-  // LISTADO
-  list_movies: [],
-  setSearchMovie: (value: string) => set({ searhMovie: value }),
+    // LISTADO
+    list_movies: [],
 
-  // VARIABLES
-  searhMovie: "",
+    isEditing : false,
 
-  // FUNCIONES
-  getMovies: async () => {
-    const result = await GET_Movies();
+    // FUNCIONES
+    getMovies: async () => {
+        const result = await GET_Movies();
 
-    if (result.success === true && Array.isArray(result.data)) {
-      set({ list_movies: result.data });
-    } else {
-      set({ list_movies: Movies_List });
-    }
+        if (result.success && Array.isArray(result.data)) {
+            set({list_movies: result.data});
+        } else {
+            set({list_movies: Movies_List});
+        }
 
-    return result.error;
-  },
+        return result.error;
+    },
 
-  findMovies: async (value: string) => {
-    set({ searhMovie: value });
+    getMovie: async (obj:MoviesDTO) => {
 
-    if (value.trim() === "") {
-      await get().getMovies();
-      set({ searhMovie: "" });
-      return;
-    }
+        useModal.getState().OpenModal("movie")
 
-    const result = await GET_Find_Movies(value);
+        set({
+            form_movie: {
+                movie_id: obj.movie_id,
+                title: obj.title,
+                gender_id: obj.gender_id,
+                year: obj.year,
+                url_cover: obj.url_cover,
+                url_video: obj.url_video
+            },
+            isEditing: true
+        })
+    },
 
-    if (result.success === true && Array.isArray(result.data)) {
-      set({ list_movies: result.data });
-    } else {
-      set({ list_movies: Movies_List });
-    }
-    set({ searhMovie: "" });
-    return result.error;
-  },
+    finMovie: async (value:string) => {
 
-  postMovies: async (obj: Movies) => {
-    const result = await POST_Movie(obj);
+        const result = await GET_Find_Movies(value.toUpperCase());
 
-    if (result.success === true) {
-      get().reset();
-      get().getMovies();
-      return result.data;
-    }
+        if (result.success && Array.isArray(result.data)) {
+            set({list_movies: result.data});
+        } else {
+           get().getMovies()
+        }
 
-    return result.error;
-  },
+        return result.error;
+    },
 
-  putMovies: async (obj: Movies, id: number) => {
-    const result = await PUT_Movie(obj, id);
+    sendMovies: async () => {
 
-    if (result.success === true) {
-      get().reset();
-      get().getMovies();
-      return result.data;
-    }
+        const { form_movie } = get();
 
-    return result.error;
-  },
+        if (form_movie.movie_id === 0) {
+            const result = await POST_Movie(form_movie);
 
-  deleteMovies: async (id: number) => {
-    const result = await DELETE_Movie(id);
+            if (!result.success) return result.error;
+        } else {
+            const result = await PUT_Movie(form_movie);
 
-    if (result.success === true) {
-      get().getMovies();
-      return result.data;
-    }
+            if (!result.success) return result.error;
+        }
 
-    return result.error;
-  },
+        get().reset();
+        get().getMovies();
+    },
 
-  reset: () => set({ form_movie: _movies }),
+    deleteMovies: async (id: number) => {
+        const result = await DELETE_Movie(id);
 
-  // FORMULARIOS
-  form_movie: _movies,
+        if (result.success) {
+            get().getMovies();
+            return result.data;
+        }
+
+        return result.error;
+    },
+
+    reset: () => set({
+        form_movie: initialMovie(),
+        isEditing: false,
+
+    }),
+
+    // FORMULARIOS
+    form_movie: initialMovie(),
 }));

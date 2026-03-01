@@ -24,7 +24,8 @@ func GetSeason(c *fiber.Ctx) error {
 		SELECT
 		s.season_id,
 		s.season_name
-		FROM season AS s`)
+		FROM season AS s
+		ORDER BY s.season_id`)
 
 	if err != nil {
 		_ = helpers.InsertLogsError(conn, "season", "Error al ejecutar la consulta")

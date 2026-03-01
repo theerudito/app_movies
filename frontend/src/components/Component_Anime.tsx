@@ -4,15 +4,18 @@ import cover from "../assets/logo.webp";
 import { Component_Search } from "./Component_Search";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../store/useAuth";
+import {useModal} from "../store/useModal.ts";
+
 
 export const Component_Anime = () => {
   const { isLogin } = useAuth((state) => state);
+    const {OpenModal} = useModal((state) => state);
   const {
-    getContentAnime,
+    getContentAnime, getContent,
+      removeContent,
     list_anime,
     type_content,
     changeType,
-    remove_content,
   } = useContent((state) => state);
 
   const nav = useNavigate();
@@ -54,13 +57,19 @@ export const Component_Anime = () => {
                   {item.year}
                 </span>
               </div>
-              {isLogin === true && item.content_id > 0 && (
+              {isLogin && item.content_id > 0 && (
                 <div className="absolute bottom-2 left-2 right-2 flex justify-between px-1">
-                  <i className="bi bi-pencil text-white text-lg cursor-pointer hover:text-purple-400"></i>
                   <i
-                    className="bi bi-trash text-white text-lg cursor-pointer hover:text-red-500"
-                    onClick={() => remove_content(item.content_id)}
+                      onClick={() => getContent(item, "content")}
+                      className="bi bi-pencil text-white text-lg cursor-pointer hover:text-purple-400" ></i>
+                  <i onClick={() => OpenModal("episode")}
+                    className="bi bi-card-list text-white text-lg cursor-pointer hover:text-purple-400"
                   ></i>
+                    <i
+                        onClick={() => removeContent(item.content_id)}
+                        className="bi bi-trash text-white text-lg cursor-pointer hover:text-red-500"
+
+                    ></i>
                 </div>
               )}
             </div>

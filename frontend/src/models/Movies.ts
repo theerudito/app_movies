@@ -13,6 +13,7 @@ export interface MoviesDTO {
   year: number;
   url_cover: string;
   url_video: string;
+  gender_id: number;
   gender: string;
 }
 

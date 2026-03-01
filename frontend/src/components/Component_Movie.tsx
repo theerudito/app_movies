@@ -8,9 +8,8 @@ import { usePlayer } from "../store/usePlayer";
 import { useAuth } from "../store/useAuth";
 
 export const Component_Movie = () => {
-  const { list_movies, getMovies, deleteMovies } = useMovies((state) => state);
+  const { list_movies, getMovies, deleteMovies, getMovie } = useMovies((state) => state);
   const { isLogin } = useAuth((state) => state);
-
   const { open_player } = usePlayer((state) => state);
   const nav = useNavigate();
 
@@ -50,14 +49,15 @@ export const Component_Movie = () => {
                 </span>
               </div>
 
-              {isLogin === true && item.movie_id > 0 && (
-                <div className="absolute bottom-2 left-2 right-2 flex justify-between px-1">
-                  <i className="bi bi-pencil text-white text-lg cursor-pointer hover:text-purple-400"></i>
-                  <i
-                    className="bi bi-trash text-white text-lg cursor-pointer hover:text-red-500"
-                    onClick={() => deleteMovies(item.movie_id)}
-                  ></i>
-                </div>
+              {isLogin && item.movie_id > 0 && (
+                  <div className="absolute bottom-2 left-2 right-2 flex justify-between px-1">
+                      <i className="bi bi-pencil text-white text-lg cursor-pointer hover:text-purple-400"
+                         onClick={() => getMovie(item)}></i>
+                      <i
+                          className="bi bi-trash text-white text-lg cursor-pointer hover:text-red-500"
+                          onClick={() => deleteMovies(item.movie_id)}
+                      ></i>
+                  </div>
               )}
             </div>
           ))}

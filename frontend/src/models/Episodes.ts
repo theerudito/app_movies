@@ -1,32 +1,26 @@
 export interface Episodes {
-  episode_id: number;
-  season_id: number;
-  episode_number: number;
-  episode_name: string;
-  episode_url: string;
+    episode_id: number;
+    number: number;
+    name: string;
+    url_video: string;
+    season_id: number;
+    content_id: number;
 }
 
 export interface EpisodeDTO {
-  episode_id: number;
-  episode_number: number;
-  episode_name: string;
-  episode_url: string;
+    episode_id: number;
+    number: number;
+    name: string;
+    url_video: string;
+    season_id: number;
+    season: string;
 }
 
 export const _episodes: Episodes = {
-  episode_id: 0,
-  season_id: 0,
-  episode_number: 0,
-  episode_name: "",
-  episode_url: "",
-};
-
-export const _episodesList: Episodes[] = [
-  {
     episode_id: 0,
+    number: 0,
+    name: "",
+    url_video: "",
     season_id: 0,
-    episode_number: 0,
-    episode_name: "",
-    episode_url: "",
-  },
-];
+    content_id: 0,
+};

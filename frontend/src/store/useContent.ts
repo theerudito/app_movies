@@ -1,27 +1,32 @@
 import { create } from "zustand";
-import { _episodes, EpisodeDTO } from "../models/Episodes";
+import {_episodes,Episodes} from "../models/Episodes";
 import {
-  _content,
   Content,
   ContentDTO,
-  ContentFullDTO,
-  SeasonEpisodeDTO,
 } from "../models/Contents";
 import {
-  Delete_Content,
-  GET_Content,
-  GET_Contents,
-  POST_Content,
+    Delete_Content,
+    GET_Contents,
+    POST_Content,
 } from "../helpers/Fetching_Content";
 import { Contents_List } from "../helpers/Data";
+import {useModal} from "./useModal.ts";
+
+const initialContent = (): Content => ({
+    content_id: 0,
+    title: "",
+    type: 0,
+    url_cover: "",
+    year: 0,
+    gender_id: 0,
+});
 
 type Data = {
   // LISTADOS
   list_anime: ContentDTO[];
   list_serie: ContentDTO[];
-  list_content: ContentFullDTO | null;
-  list_contenten_season: SeasonEpisodeDTO | null;
-  loading: boolean;
+
+  isEditing: boolean;
   contend_id: number;
 
   // DATOS
@@ -32,131 +37,140 @@ type Data = {
   // FUNCIONES
   openContent_Type: (open: boolean, id: number) => void;
   changeType: (type: number) => void;
+
+  // CONTENT
   getContentAnime: (location: string) => void;
   getContentSerie: (location: string) => void;
-  getContent: (id: number) => void;
-  getContent_Season_Episode: (id: number, seasonid: number) => void;
-  findContent: (type: number, value: string) => void;
-  postContent: (obj: Content) => void;
-  putContent: (obj: Content) => void;
-  remove_content: (id: number) => void;
+  getContent: (obj:ContentDTO, modal:string) => void;
+  findContent: (value:string) => void;
+  sendContent: (obj: Content) => void;
+  removeContent: (id: number) => void;
+
+  // EPISODE
   reset: () => void;
 
   // FORMULARIOS
   form_content: Content;
-  form_episode: EpisodeDTO;
+  form_episode: Episodes;
 };
 
 export const useContent = create<Data>((set, get) => ({
-  // LISTADOS
-  list_anime: [],
-  list_serie: [],
-  list_content: null,
-  list_contenten_season: null,
-  loading: false,
+    // LISTADOS
+    list_anime: [],
+    list_serie: [],
 
-  // DATOS
-  episode_id: 0,
-  type_content: 1,
-  contend_id: 0,
-  openContent: false,
+    isEditing: false,
 
-  // FORMULARIOS
-  form_content: _content,
-  form_episode: _episodes,
+    // DATOS
+    episode_id: 0,
+    type_content: 1,
+    contend_id: 0,
+    openContent: false,
 
-  // FUNCIONES
-  openContent_Type: (open, id) => {
-    set({ openContent: open, contend_id: id });
-  },
+    // FUNCIONES
+    openContent_Type: (open, id) => {
+        set({openContent: open, contend_id: id});
+    },
 
-  changeType: (type) => {
-    set({ type_content: Number(type) });
-  },
+    changeType: (type) => {
+        set({type_content: Number(type)});
+    },
 
-  getContentAnime: async (location: string) => {
-    set({ loading: true });
+    // CONTENT
+    getContentAnime: async (location: string) => {
 
-    const result = await GET_Contents(
-      location === "home" ? 1 : get().type_content,
-    );
+        const result = await GET_Contents(
+            location === "home" ? 1 : get().type_content,
+        );
 
-    if (result.success && Array.isArray(result.data)) {
-      set({ list_anime: result.data });
-    } else {
-      set({ list_anime: Contents_List });
-    }
+        if (result.success && Array.isArray(result.data)) {
+            set({list_anime: result.data});
+        } else {
+            set({list_anime: Contents_List});
+        }
 
-    set({ loading: false });
-  },
+    },
 
-  getContentSerie: async (location: string) => {
-    set({ loading: true });
+    getContentSerie: async (location: string) => {
 
-    const result = await GET_Contents(
-      location === "home" ? 2 : get().type_content,
-    );
+        const result = await GET_Contents(
+            location === "home" ? 2 : get().type_content,
+        );
 
-    if (result.success && Array.isArray(result.data)) {
-      set({ list_serie: result.data });
-    } else {
-      set({ list_serie: Contents_List });
-    }
+        if (result.success && Array.isArray(result.data)) {
+            set({list_serie: result.data});
+        } else {
+            set({list_serie: Contents_List});
+        }
 
-    set({ loading: false });
-  },
+    },
 
-  getContent: async (id: number) => {
-    set({ loading: true });
+    getContent: async (obj: ContentDTO, modal: string) => {
 
-    const result = await GET_Content(id);
+        useModal.getState().OpenModal(modal)
 
-    if (result.success && result.data) {
-      set({ list_content: result.data });
-    } else {
-      set({ list_serie: Contents_List });
-    }
+        set({
+            form_content: {
+                content_id: obj.content_id,
+                title: obj.title,
+                type: 1,
+                year: obj.year,
+                url_cover: obj.url_cover,
+                gender_id: obj.gender_id
+            },
+            isEditing: true
+        })
 
-    set({ loading: false });
-  },
+    },
 
-  postContent: async (obj) => {
-    const result = await POST_Content(obj);
+    findContent: async () => {
+    },
 
-    if (result.success) {
-      get().reset();
+    sendContent: async (obj: Content) => {
+        const result = await POST_Content(obj);
 
-      if (obj.type === 1) {
-        await get().getContentAnime;
-      } else {
-        await get().getContentSerie;
-      }
+        if (result.success) {
+            get().reset();
 
-      return result.data;
-    }
+            if (obj.type === 1) {
+                get().getContentAnime("");
+            } else {
+                get().getContentSerie("");
+            }
 
-    return result.error;
-  },
+            return result.data;
+        }
 
-  getContent_Season_Episode: async () => {},
-  findContent: async () => {},
-  putContent: async () => {},
-  remove_content: async (id: number) => {
-    const result = await Delete_Content(id);
+        return result.error;
+    },
 
-    if (result.success) {
-      await get().getContentAnime;
-      await get().getContentSerie;
-      return result.data;
-    }
+    removeContent: async (id: number) => {
+        const result = await Delete_Content(id);
 
-    return result.error;
-  },
+            if ( get().type_content === 1) {
+                if (result.success) {
+                    get().getContentAnime("anime");
+                    return result.data;
+                }
+            } else {
+                if (result.success) {
+                    get().getContentSerie("serie");
+                    return result.data;
+                }
+            }
 
-  reset: () => {
-    set({
-      form_content: _content,
-      form_episode: _episodes,
-    });
-  },
+        return result.error;
+    },
+
+    // EPISODE
+    reset: () => set({
+        form_content: initialContent(),
+        isEditing: false,
+
+    }),
+
+    // FORMULARIOS
+    form_content: initialContent(),
+    form_episode: _episodes,
+
 }));

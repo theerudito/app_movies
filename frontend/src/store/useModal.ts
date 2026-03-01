@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import {useMovies} from "./useMovies.ts";
 
 type Data = {
   modalStack: string[];
@@ -25,6 +26,9 @@ export const useModal = create<Data>((set) => ({
   CloseModal: () =>
     set((state) => {
       const newStack = state.modalStack.slice(0, -1);
+
+      useMovies.getState().reset()
+
       return {
         modalStack: newStack,
         currentModal:
@@ -32,5 +36,5 @@ export const useModal = create<Data>((set) => ({
       };
     }),
 
-  reset: () => set({ modalStack: [], currentModal: null }),
+  reset: () => set({ modalStack: [], currentModal: null }, ),
 }));

@@ -45,9 +45,9 @@ export const POST_Movie = async (obj: Movies) => {
   }
 };
 
-export const PUT_Movie = async (obj: Movies, id: number) => {
+export const PUT_Movie = async (obj: Movies) => {
   try {
-    const response = await axios.put(`${url_base}/movie/${id}`, obj);
+    const response = await axios.put(`${url_base}/movie`, obj);
     return { success: true, data: response.data };
   } catch (error: unknown) {
     let message = "Error desconocido";

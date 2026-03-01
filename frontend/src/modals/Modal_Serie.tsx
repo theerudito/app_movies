@@ -10,8 +10,7 @@ export const Modal_Anime = () => {
         gender_list,
         getGender,
         year_list,
-        getYear,
-        getType,
+        getYear
     } = useData((state) => state);
     const {form_content, postContent} = useContent((state) => state);
 
@@ -51,12 +50,16 @@ export const Modal_Anime = () => {
     useEffect(() => {
         getGender();
         getYear();
-        getType();
-    }, [getGender, getYear, getType]);
+    }, [getGender, getYear]);
 
     const sendData = () => {
 
-        if (form_content.gender_id === 0 ) {
+        if (form_content.year === 0) {
+            alert("Debes seleccionar un año");
+            return;
+        }
+
+        if (form_content.gender_id === 0) {
             alert("Debes seleccionar un genero");
             return;
         }

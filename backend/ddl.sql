@@ -49,6 +49,7 @@ CREATE TABLE content_type
     content_title TEXT    NOT NULL,
     content_type  INTEGER NOT NULL,
     content_year  INTEGER NOT NULL,
+    is_complete BOOLEAN DEFAULT false,
 
     cover_id      INT,
 

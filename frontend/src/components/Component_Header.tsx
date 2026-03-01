@@ -18,9 +18,8 @@ import {Modal_Login} from "../modals/Modal_Login";
 import {Modal_Gender} from "../modals/Modal_Gender";
 import {Modal_Movie} from "../modals/Modal_Movie";
 import {Modal_Anime} from "../modals/Modal_Serie";
-import {Modal_Serie} from "../modals/Modal_Anime";
-import {Modal_Episode_Anime} from "../modals/Modal_Episode_Anime.tsx";
-import {Modal_Episode_Serie} from "../modals/Modal_Episode_Serie.tsx";
+import {Modal_Episode} from "../modals/Modal_Episode.tsx";
+import {Modal_Content} from "../modals/Modal_Content.tsx";
 
 export const Component_Header = () => {
     const {changeType, openContent_Type} = useContent((state) => state);
@@ -92,17 +91,12 @@ export const Component_Header = () => {
                                 <div className="absolute left-full top-0 hidden group-hover:block">
                                     <div className="w-48 bg-slate-900 rounded-lg  p-3">
                                         <button
-                                            onClick={() => OpenModal("anime")}
+                                            onClick={() => OpenModal("content")}
                                             className="block w-full text-left text-white hover:bg-gray-700 p-2 rounded"
                                         >
                                             Añadir Anime
                                         </button>
-                                        <button
-                                            onClick={() => OpenModal("episode_anime")}
-                                            className="block w-full text-left text-white hover:bg-gray-700 p-2 rounded"
-                                        >
-                                            Añadir Episodios
-                                        </button>
+
                                     </div>
                                 </div>
                             </div>
@@ -113,17 +107,12 @@ export const Component_Header = () => {
                                 <div className="absolute left-full top-0 hidden group-hover:block">
                                     <div className="w-48 bg-slate-900 rounded-lg  p-3">
                                         <button
-                                            onClick={() => OpenModal("serie")}
+                                            onClick={() => OpenModal("content")}
                                             className="block w-full text-left text-white hover:bg-gray-700 p-2 rounded"
                                         >
                                             Añadir Serie
                                         </button>
-                                        <button
-                                            onClick={() => OpenModal("episode_serie")}
-                                            className="block w-full text-left text-white hover:bg-gray-700 p-2 rounded"
-                                        >
-                                            Añadir Episodios
-                                        </button>
+
                                     </div>
                                 </div>
                             </div>
@@ -154,9 +143,8 @@ export const Component_Header = () => {
             <Modal_Gender/>
             <Modal_Movie/>
             <Modal_Anime/>
-            <Modal_Serie/>
-            <Modal_Episode_Anime/>
-            <Modal_Episode_Serie/>
+            <Modal_Content/>
+            <Modal_Episode/>
         </>
     );
 };

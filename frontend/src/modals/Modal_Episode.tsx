@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useModal } from "../store/useModal";
 import { useContent } from "../store/useContent";
-import { Episodes } from "../models/Contents";
-import {useData} from "../store/useData.ts";
 
-export const Modal_Episode_Serie = () => {
+import {useData} from "../store/useData.ts";
+import {Episodes} from "../models/Episodes.ts";
+
+export const Modal_Episode = () => {
     const { currentModal, CloseModal } = useModal((state) => state);
     const [chapters, setChapters] = useState<Episodes[]>([]);
     const { getContent, list_anime } = useContent((state) => state);
@@ -34,7 +35,7 @@ export const Modal_Episode_Serie = () => {
     };
 
     const addChapter = () => {
-        const newEpisode: Episodes = {
+        /*const newEpisode: Episodes = {
             episode_id: Date.now(),
             number: chapters.length + 1,
             name: "",
@@ -44,6 +45,7 @@ export const Modal_Episode_Serie = () => {
         };
 
         setChapters((prev) => [...prev, newEpisode]);
+         */
     };
 
     const handleChapterChange = (
@@ -76,7 +78,6 @@ export const Modal_Episode_Serie = () => {
 
     useEffect(() => {
         getSeason()
-        getContent(2)
     }, [getContent, getSeason]);
 
     const sendData = () => {
@@ -85,11 +86,11 @@ export const Modal_Episode_Serie = () => {
 
     return (
         <div>
-            {currentModal === "episode_serie" && (
+            {currentModal === "episode" && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
                     <div className="w-full max-w-lg bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-6 animate-modalIn">
                         <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 pb-3 mb-4 text-lg font-semibold text-gray-800 dark:text-gray-100">
-                            <p>AÑADIR EPISODIO DE SERIE</p>
+                            <p>AÑADIR EPISODIO DE ANIME</p>
                             <i
                                 className="bi bi-x-lg cursor-pointer text-gray-400 hover:text-red-500 transition-colors"
                                 onClick={() => CloseModal()}

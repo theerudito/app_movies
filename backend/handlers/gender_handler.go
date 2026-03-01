@@ -23,7 +23,8 @@ func GetGender(c *fiber.Ctx) error {
 
 	rows, err = conn.Query(`
 		SELECT g.gender_id, g.gender_name
-		FROM gender AS g`)
+		FROM gender AS g
+		ORDER BY g.gender_id`)
 
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error al consultar los registros"})
