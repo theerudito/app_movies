@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import {useMovies} from "./useMovies.ts";
+import {useContent} from "./useContent.ts";
 
 type Data = {
   modalStack: string[];
@@ -28,6 +29,7 @@ export const useModal = create<Data>((set) => ({
       const newStack = state.modalStack.slice(0, -1);
 
       useMovies.getState().reset()
+        useContent.getState().reset()
 
       return {
         modalStack: newStack,

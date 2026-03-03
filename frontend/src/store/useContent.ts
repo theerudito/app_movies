@@ -1,28 +1,39 @@
 import { create } from "zustand";
-import {_episodes,Episodes} from "../models/Episodes";
+import {EpisodeDTO, Episodes} from "../models/Episodes";
 import {
   Content,
   ContentDTO,
 } from "../models/Contents";
 import {
     Delete_Content,
-    GET_Contents,
-    POST_Content,
+    GET_Contents, Get_Episode, GET_Find_Content,
+    POST_Content, Post_Episode, PUT_Content, Put_Episode,
 } from "../helpers/Fetching_Content";
 import { Contents_List } from "../helpers/Data";
 import {useModal} from "./useModal.ts";
 
+
 const initialContent = (): Content => ({
     content_id: 0,
     title: "",
-    type: 0,
+    content_type_id: 0,
     url_cover: "",
     year: 0,
     gender_id: 0,
 });
 
+const initialEpisode = (): Episodes => ({
+    episode_id: 0,
+    number: 0,
+    name: "",
+    url_video: "",
+    season_id: 0,
+    content_id: 0,
+});
+
 type Data = {
-  // LISTADOS
+
+    // LISTADOS
   list_anime: ContentDTO[];
   list_serie: ContentDTO[];
 
@@ -47,14 +58,19 @@ type Data = {
   removeContent: (id: number) => void;
 
   // EPISODE
+    getEpisode: (id: number, modal: string) => void
+    sendEpisode: (obj:Episodes, modal:string) => void
+
   reset: () => void;
 
   // FORMULARIOS
   form_content: Content;
   form_episode: Episodes;
+
 };
 
 export const useContent = create<Data>((set, get) => ({
+
     // LISTADOS
     list_anime: [],
     list_serie: [],
@@ -79,9 +95,7 @@ export const useContent = create<Data>((set, get) => ({
     // CONTENT
     getContentAnime: async (location: string) => {
 
-        const result = await GET_Contents(
-            location === "home" ? 1 : get().type_content,
-        );
+        const result = await GET_Contents(location === "home" ? 1 : get().type_content);
 
         if (result.success && Array.isArray(result.data)) {
             set({list_anime: result.data});
@@ -93,9 +107,7 @@ export const useContent = create<Data>((set, get) => ({
 
     getContentSerie: async (location: string) => {
 
-        const result = await GET_Contents(
-            location === "home" ? 2 : get().type_content,
-        );
+        const result = await GET_Contents(location === "home" ? 2 : get().type_content);
 
         if (result.success && Array.isArray(result.data)) {
             set({list_serie: result.data});
@@ -113,7 +125,7 @@ export const useContent = create<Data>((set, get) => ({
             form_content: {
                 content_id: obj.content_id,
                 title: obj.title,
-                type: 1,
+                content_type_id: obj.content_type_id,
                 year: obj.year,
                 url_cover: obj.url_cover,
                 gender_id: obj.gender_id
@@ -123,25 +135,49 @@ export const useContent = create<Data>((set, get) => ({
 
     },
 
-    findContent: async () => {
+    findContent: async (value:string) => {
+
+        const result = await GET_Find_Content(get().type_content, value.toUpperCase());
+
+        if (result.success && Array.isArray(result.data)) {
+
+            if (get().type_content === 1) {
+                set({list_anime  : result.data});
+            } else {
+                set({list_serie  : result.data});
+            }
+        } else {
+
+            if (get().type_content === 1) {
+                set({list_anime  : Contents_List});
+            } else {
+                set({list_serie  : Contents_List});
+            }
+        }
     },
 
-    sendContent: async (obj: Content) => {
-        const result = await POST_Content(obj);
+    sendContent: async () => {
 
-        if (result.success) {
+        const { form_content } = get();
+
+        console.log(form_content)
+
+        if (form_content.content_id === 0) {
+            const result = await POST_Content(form_content);
+
+            if (!result.success) return result.error;
+        } else {
+            const result = await PUT_Content(form_content);
+
+            if (!result.success) return result.error;
+        }
             get().reset();
 
-            if (obj.type === 1) {
+            if (form_content.content_type_id === 1) {
                 get().getContentAnime("");
             } else {
                 get().getContentSerie("");
             }
-
-            return result.data;
-        }
-
-        return result.error;
     },
 
     removeContent: async (id: number) => {
@@ -163,14 +199,60 @@ export const useContent = create<Data>((set, get) => ({
     },
 
     // EPISODE
+    getEpisode: async (id: number, modal: string) => {
+
+        const result = await Get_Episode(id);
+
+        if (result.success && result.data) {
+
+            useModal.getState().OpenModal(modal);
+
+            result.data.forEach((episode: EpisodeDTO) => {
+                console.log(episode.name);
+
+                set({
+                    form_episode: {
+                        episode_id: episode.episode_id,
+                        content_id: episode.content_id,
+                        name: episode.name,
+                        number: episode.number,
+                        season_id: episode.season_id,
+                        url_video: episode.url_video,
+                    },
+                    isEditing: true
+                });
+            });
+        }
+    },
+
+    sendEpisode: async(obj:Episodes) => {
+
+        const { form_episode } = get();
+
+        if (form_episode.episode_id === 0) {
+            const result = await Post_Episode(obj);
+
+            if (!result.success) return result.error;
+        } else {
+            const result = await Put_Episode(obj);
+
+            if (!result.success) return result.error;
+        }
+
+        get().reset();
+        get().getContentSerie("");
+        get().getContentSerie("");
+
+    },
+
     reset: () => set({
         form_content: initialContent(),
+        form_episode: initialEpisode(),
         isEditing: false,
-
     }),
 
     // FORMULARIOS
     form_content: initialContent(),
-    form_episode: _episodes,
+    form_episode: initialEpisode(),
 
 }));

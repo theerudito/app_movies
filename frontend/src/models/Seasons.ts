@@ -15,9 +15,3 @@ export const _season: Season = {
   season_id: 0,
   season_name: "",
 };
-
-export const _seasonDTO: SeasonDTO = {
-  season_id: 0,
-  season_name: "",
-  episodes: [] as EpisodeDTO[],
-};

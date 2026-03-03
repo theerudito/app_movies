@@ -16,12 +16,3 @@ export interface MoviesDTO {
   gender_id: number;
   gender: string;
 }
-
-export const _movies: Movies = {
-  movie_id: 0,
-  title: "",
-  year: 0,
-  url_cover: "",
-  url_video: "",
-  gender_id: 0,
-};

@@ -1,14 +1,15 @@
 package dto
 
 type ContentDTO struct {
-	ContentId int    `json:"content_id"`
-	Title     string `json:"title"`
-	Type      string `json:"type"`
-	StorageId int    `json:"storage_id"`
-	UrlCover  string `json:"url_cover"`
-	Year      int    `json:"year"`
-	GenderId  int    `json:"gender_id"`
-	Gender    string `json:"gender"`
+	ContentId     int    `json:"content_id"`
+	Title         string `json:"title"`
+	ContentTypeId int    `json:"content_type_id"`
+	Type          string `json:"type"`
+	StorageId     int    `json:"storage_id"`
+	UrlCover      string `json:"url_cover"`
+	Year          int    `json:"year"`
+	GenderId      int    `json:"gender_id"`
+	Gender        string `json:"gender"`
 }
 
 type ContentFullDTO struct {

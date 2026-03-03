@@ -42,6 +42,7 @@ func SetupRoutes(app *fiber.App) {
 	v1.Get("/content/:type/find/:value", handlers.GetFindContent)
 	v1.Post("/content", handlers.PostContent)
 	v1.Put("/content", handlers.PutContent)
+	v1.Get("/content/episode/:id", handlers.GetEpisode)
 	v1.Post("/content/episode", handlers.PostEpisode)
 	v1.Put("/content/episode", handlers.PutEpisode)
 	v1.Delete("/content/:id", handlers.DeleteContent)

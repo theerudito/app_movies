@@ -3,6 +3,7 @@ import { useModal } from "../store/useModal";
 import { useData } from "../store/useData";
 import { useContent } from "../store/useContent";
 import { Content } from "../models/Contents";
+import {_content_type} from "../models/Content_Type.ts";
 
 export const Modal_Content = () => {
   const { currentModal, OpenModal, CloseModal } = useModal((state) => state);
@@ -30,7 +31,7 @@ export const Modal_Content = () => {
         useContent.setState((state) => ({
             form_content: {
                 ...state.form_content,
-                [name]: name === "year" || name === "gender_id"
+                [name]: name === "year" || name === "gender_id" || name === "content_type_id"
                     ? Number(value)
                     : value,
             },
@@ -44,6 +45,11 @@ export const Modal_Content = () => {
 
     const sendData = () => {
 
+        if (form_content.content_type_id === 0) {
+            alert("Debes seleccionar un tipo de contenido");
+            return;
+        }
+
         if (form_content.year === 0) {
             alert("Debes seleccionar un año");
             return;
@@ -54,7 +60,7 @@ export const Modal_Content = () => {
             return;
         }
 
-        const {title, url_cover, year, gender_id} = form_content;
+        const {title, url_cover, year, gender_id, content_type_id} = form_content;
 
         const currentYear = new Date().getFullYear();
 
@@ -62,7 +68,7 @@ export const Modal_Content = () => {
             content_id: 0,
             title,
             url_cover,
-            type: 1,
+            content_type_id: Number(content_type_id) === 0 ? 1 : Number(content_type_id),
             year: year === 0 ? currentYear : Number(year),
             gender_id: Number(gender_id) === 0 ? 1 : Number(gender_id),
         };
@@ -83,26 +89,21 @@ export const Modal_Content = () => {
               ></i>
             </div>
 
-
-
             <div className="flex flex-col gap-4">
 
                 <select
-                    name="content_id"
-                    value={form_content.content_id}
+                    name="content_type_id"
+                    value={form_content.content_type_id}
                     onChange={handleChangeSelect}
                     className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
                 >
                     <option value="0">SELECCIONA ANIME O SERIE</option>
-
-                    <option  value="1">
-                        ANIME
-                    </option>
-                    <option  value="2">
-                        SERIE
-                    </option>
+                    {_content_type.map((item) => (
+                        <option key={item.content_type_id} value={item.content_type_id}>
+                            {item.title}
+                        </option>
+                    ))}
                 </select>
-
 
               <input
                 type="text"

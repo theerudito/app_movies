@@ -8,7 +8,7 @@ import {Episodes} from "../models/Episodes.ts";
 export const Modal_Episode = () => {
     const { currentModal, CloseModal } = useModal((state) => state);
     const [chapters, setChapters] = useState<Episodes[]>([]);
-    const { getContent, list_anime } = useContent((state) => state);
+    const { getContent } = useContent((state) => state);
     const { getSeason, season_list } = useData((state) => state);
 
     const handleChangeSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -98,19 +98,6 @@ export const Modal_Episode = () => {
                         </div>
 
                         <div className="flex flex-col gap-4">
-
-                            <select
-                                name="content_id"
-                                onChange={handleChangeSelect}
-                                className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
-                            >
-                                <option value="0">SELECCIONA UN TITULO</option>
-                                {list_anime.map((item) => (
-                                    <option key={item.content_id} value={item.content_id}>
-                                        {item.title}
-                                    </option>
-                                ))}
-                            </select>
 
                             <select
                                 name="season_id"

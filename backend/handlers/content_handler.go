@@ -37,7 +37,8 @@ func GetContent(c *fiber.Ctx) error {
 		WHEN c.content_type = 1 
 		THEN 'ANIME'
 		ELSE 'SERIE'
-		END AS type
+		END AS type,
+	    c.content_type
 	FROM content_type c
 		INNER JOIN gender AS g ON g.gender_id = c.gender_id
 		INNER JOIN storage AS s ON s.storage_id = c.cover_id
@@ -60,7 +61,8 @@ func GetContent(c *fiber.Ctx) error {
 			&content.Gender,
 			&content.StorageId,
 			&content.UrlCover,
-			&content.Type)
+			&content.Type,
+			&content.ContentTypeId)
 
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error al leer los registros"})
@@ -353,7 +355,7 @@ func PostContent(c *fiber.Ctx) error {
 
 	defer tx.Rollback()
 
-	switch content.Type {
+	switch content.ContentTypeId {
 	case 1:
 		typeId = 1
 	case 2:
@@ -434,7 +436,7 @@ func PutContent(c *fiber.Ctx) error {
 
 	defer tx.Rollback()
 
-	switch content.Type {
+	switch content.ContentTypeId {
 	case 1:
 		typeId = 1
 	case 2:
@@ -481,6 +483,49 @@ func PutContent(c *fiber.Ctx) error {
 	}
 
 	return c.Status(201).JSON(fiber.Map{"message": "registro modificado correctamente"})
+}
+
+func GetEpisode(c *fiber.Ctx) error {
+	var (
+		episodes []dto.EpisodeDTO
+		conn     = db.GetDB()
+		rows     *sql.Rows
+		err      error
+		id       = c.Params("id")
+	)
+
+	rows, err = conn.Query(`SELECT FROM episode WHERE content_id = $1`, id)
+
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error al ejecutar la consulta"})
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var episode dto.EpisodeDTO
+		err = rows.Scan(
+			&episode.ContentId,
+			&episode.EpisodeId,
+			&episode.Name,
+			&episode.Number,
+			&episode.UrlVideo,
+			&episode.Season,
+			&episode.SeasonId)
+
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error al leer los registros"})
+		}
+
+		episodes = append(episodes, episode)
+	}
+
+	if len(episodes) == 0 {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "No se encontraron registros"})
+	}
+
+	return c.JSON(episodes)
+
 }
 
 func PostEpisode(c *fiber.Ctx) error {
