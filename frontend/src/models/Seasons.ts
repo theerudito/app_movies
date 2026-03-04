@@ -1,4 +1,4 @@
-import { EpisodeDTO } from "./Episodes";
+import { EpisodeDTO } from "./Episode.ts";
 
 export interface Season {
   season_id: number;

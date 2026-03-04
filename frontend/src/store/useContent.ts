@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import {EpisodeDTO, Episodes} from "../models/Episodes";
+import {Episode, Episodes} from "../models/Episode.ts";
 import {
   Content,
   ContentDTO,
@@ -7,7 +7,7 @@ import {
 import {
     Delete_Content,
     GET_Contents, Get_Episode, GET_Find_Content,
-    POST_Content, Post_Episode, PUT_Content, Put_Episode,
+    POST_Content, PUT_Content,
 } from "../helpers/Fetching_Content";
 import { Contents_List } from "../helpers/Data";
 import {useModal} from "./useModal.ts";
@@ -22,14 +22,20 @@ const initialContent = (): Content => ({
     gender_id: 0,
 });
 
-const initialEpisode = (): Episodes => ({
-    episode_id: 0,
-    number: 0,
-    name: "",
-    url_video: "",
-    season_id: 0,
-    content_id: 0,
-});
+export const initialEpisode = (): Episodes => (
+    {
+        content_id : 0,
+        season_id : 0,
+        episodes :[
+            {
+                episode_id: 0,
+                number: 0,
+                name: "",
+                url_video: ""
+            }
+        ]
+    }
+);
 
 type Data = {
 
@@ -59,7 +65,7 @@ type Data = {
 
   // EPISODE
     getEpisode: (id: number, modal: string) => void
-    sendEpisode: (obj:Episodes, modal:string) => void
+    sendEpisode: (obj:Episode, modal:string) => void
 
   reset: () => void;
 
@@ -160,23 +166,21 @@ export const useContent = create<Data>((set, get) => ({
 
         const { form_content } = get();
 
-        console.log(form_content)
-
-        if (form_content.content_id === 0) {
+       if (form_content.content_id === 0) {
             const result = await POST_Content(form_content);
-
             if (!result.success) return result.error;
         } else {
             const result = await PUT_Content(form_content);
-
             if (!result.success) return result.error;
         }
             get().reset();
 
             if (form_content.content_type_id === 1) {
-                get().getContentAnime("");
-            } else {
-                get().getContentSerie("");
+                get().getContentAnime("anime");
+            }
+
+            if (form_content.content_type_id === 2) {
+                get().getContentSerie("serie");
             }
     },
 
@@ -203,33 +207,19 @@ export const useContent = create<Data>((set, get) => ({
 
         const result = await Get_Episode(id);
 
-        if (result.success && result.data) {
+        useModal.getState().OpenModal(modal);
 
-            useModal.getState().OpenModal(modal);
-
-            result.data.forEach((episode: EpisodeDTO) => {
-                console.log(episode.name);
-
-                set({
-                    form_episode: {
-                        episode_id: episode.episode_id,
-                        content_id: episode.content_id,
-                        name: episode.name,
-                        number: episode.number,
-                        season_id: episode.season_id,
-                        url_video: episode.url_video,
-                    },
-                    isEditing: true
-                });
-            });
-        }
+        set({
+            form_episode: result.data,
+            isEditing: true
+        });
     },
 
-    sendEpisode: async(obj:Episodes) => {
+    sendEpisode: async(obj:Episode) => {
 
-        const { form_episode } = get();
+        //const { form_episode } = get();
 
-        if (form_episode.episode_id === 0) {
+      /* if (form_episode.content_id === 0) {
             const result = await Post_Episode(obj);
 
             if (!result.success) return result.error;
@@ -237,7 +227,7 @@ export const useContent = create<Data>((set, get) => ({
             const result = await Put_Episode(obj);
 
             if (!result.success) return result.error;
-        }
+        }*/
 
         get().reset();
         get().getContentSerie("");

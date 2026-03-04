@@ -5,7 +5,7 @@ import {
 } from "../models/Contents";
 import { url_base } from "./Initial";
 import { AddGuiones } from "./Añadir_Guiones";
-import {EpisodeDTO, Episodes} from "../models/Episodes.ts";
+import {Episodes} from "../models/Episode.ts";
 
 export const GET_Contents = async (type: number) => {
   try {
@@ -92,7 +92,7 @@ export const Delete_Content = async (id: number) => {
 
 export const Get_Episode = async (id: number) => {
     try {
-        const response = await axios.get<EpisodeDTO[]>(`${url_base}/content/${id}`);
+        const response = await axios.get<Episodes>(`${url_base}/content/episode/${id}`);
         return { success: true, data: response.data };
     } catch (error: unknown) {
         let message = "Error desconocido";

@@ -10,6 +10,7 @@ type ContentDTO struct {
 	Year          int    `json:"year"`
 	GenderId      int    `json:"gender_id"`
 	Gender        string `json:"gender"`
+	IsComplete    bool   `json:"is_complete"`
 }
 
 type ContentFullDTO struct {

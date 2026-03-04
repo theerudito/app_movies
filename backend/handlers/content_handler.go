@@ -38,7 +38,8 @@ func GetContent(c *fiber.Ctx) error {
 		THEN 'ANIME'
 		ELSE 'SERIE'
 		END AS type,
-	    c.content_type
+	    c.content_type,
+	    c.is_complete
 	FROM content_type c
 		INNER JOIN gender AS g ON g.gender_id = c.gender_id
 		INNER JOIN storage AS s ON s.storage_id = c.cover_id
@@ -62,7 +63,8 @@ func GetContent(c *fiber.Ctx) error {
 			&content.StorageId,
 			&content.UrlCover,
 			&content.Type,
-			&content.ContentTypeId)
+			&content.ContentTypeId,
+			&content.IsComplete)
 
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error al leer los registros"})
@@ -282,7 +284,8 @@ func GetFindContent(c *fiber.Ctx) error {
 		WHEN c.content_type = 1 
 		THEN 'ANIME'
 		ELSE 'SERIE'
-		END AS type
+		END AS type,
+	    c.is_complete
 	FROM content_type c
 		INNER JOIN gender AS g ON g.gender_id = c.gender_id
 		INNER JOIN storage AS s ON s.storage_id = c.cover_id
@@ -305,7 +308,8 @@ func GetFindContent(c *fiber.Ctx) error {
 			&content.Gender,
 			&content.StorageId,
 			&content.UrlCover,
-			&content.Type)
+			&content.Type,
+			&content.IsComplete)
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error al leer los registros"})
 		}
@@ -530,28 +534,28 @@ func GetEpisode(c *fiber.Ctx) error {
 
 func PostEpisode(c *fiber.Ctx) error {
 	var (
-		episode []entities.Episode
-		conn    = db.GetDB()
-		err     error
-		tx      *sql.Tx
-		videId  int
+		episodes []entities.Episode
+		conn     = db.GetDB()
+		err      error
+		tx       *sql.Tx
+		videId   int
 	)
 
-	if err = c.BodyParser(&episode); err != nil {
-		_ = helpers.InsertLogsError(conn, "episode", "Cuerpo de solicitud inválido "+err.Error())
+	if err = c.BodyParser(&episodes); err != nil {
+		_ = helpers.InsertLogsError(conn, "episodes", "Cuerpo de solicitud inválido "+err.Error())
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Cuerpo de solicitud inválido"})
 	}
 
 	tx, err = conn.Begin()
 
 	if err != nil {
-		_ = helpers.InsertLogsError(conn, "episode", "error iniciando transacción "+err.Error())
+		_ = helpers.InsertLogsError(conn, "episodes", "error iniciando transacción "+err.Error())
 		return c.Status(500).JSON(fiber.Map{"messaje": "error iniciando transacción"})
 	}
 
 	defer tx.Rollback()
 
-	for _, ep := range episode {
+	for _, ep := range episodes {
 
 		videId, err = helpers.StorageManager(dto.StorageItemDTO{Option: "INSERT", FileName: uuid.New().String(), Url: ep.UrlVideo, TX: tx})
 		if err != nil {
@@ -572,21 +576,31 @@ func PostEpisode(c *fiber.Ctx) error {
 			ep.ContentId)
 
 		if err != nil {
-			_ = helpers.InsertLogsError(conn, "episode", "No se pudo crear el registro "+err.Error())
+			_ = helpers.InsertLogsError(conn, "episodes", "No se pudo crear el registro "+err.Error())
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "No se pudo crear el registro"})
 		}
 
-		err = helpers.InsertLogs(conn, "INSERT", "episode", ep.ContentId, "registro creado correctamente")
+		err = helpers.InsertLogs(conn, "INSERT", "episodes", ep.ContentId, "registro creado correctamente")
 		if err != nil {
-			_ = helpers.InsertLogsError(conn, "episode", "error insertando la auditoria "+err.Error())
+			_ = helpers.InsertLogsError(conn, "episodes", "error insertando la auditoria "+err.Error())
 			return c.Status(500).JSON(fiber.Map{"messaje": "error insertando la auditoria"})
 		}
+	}
+
+	_, err = tx.Exec(`
+		UPDATE content_type 
+		SET is_complete 	= true
+		WHERE content_id  	= $1`, episodes[0].ContentId)
+
+	if err != nil {
+		_ = helpers.InsertLogsError(conn, "content", "error actualizando el registro "+err.Error())
+		return c.Status(500).JSON(fiber.Map{"messaje": "error actualizando el registro"})
 	}
 
 	err = tx.Commit()
 
 	if err != nil {
-		_ = helpers.InsertLogsError(conn, "episode", "error confirmando transacción "+err.Error())
+		_ = helpers.InsertLogsError(conn, "episodes", "error confirmando transacción "+err.Error())
 		return c.Status(500).JSON(fiber.Map{"messaje": "error confirmando transacción"})
 	}
 
@@ -695,6 +709,16 @@ func PutEpisode(c *fiber.Ctx) error {
 			_ = helpers.InsertLogsError(conn, "episode", "error insertando episodio "+err.Error())
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "No se pudo crear el registro"})
 		}
+	}
+
+	_, err = tx.Exec(`
+		UPDATE content_type 
+		SET is_complete 	= true
+		WHERE content_id  	= $1`, episodes[0].ContentId)
+
+	if err != nil {
+		_ = helpers.InsertLogsError(conn, "content", "error actualizando el registro "+err.Error())
+		return c.Status(500).JSON(fiber.Map{"messaje": "error actualizando el registro"})
 	}
 
 	err = tx.Commit()

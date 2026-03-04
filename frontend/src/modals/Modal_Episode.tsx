@@ -1,87 +1,51 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import { useModal } from "../store/useModal";
-import { useContent } from "../store/useContent";
-
+import {initialEpisode, useContent} from "../store/useContent";
 import {useData} from "../store/useData.ts";
-import {Episodes} from "../models/Episodes.ts";
+import {Episode, Episodes} from "../models/Episode.ts";
 
 export const Modal_Episode = () => {
     const { currentModal, CloseModal } = useModal((state) => state);
-    const [chapters, setChapters] = useState<Episodes[]>([]);
-    const { getContent } = useContent((state) => state);
+    const [episodes, setEpisodes] = useState<Episodes>(initialEpisode());
+    const { form_episode} = useContent((state) => state);
     const { getSeason, season_list } = useData((state) => state);
 
     const handleChangeSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const { name, value, selectedIndex, options } = e.target;
+        const {name, value} = e.target;
 
-        useContent.setState((state) => {
-            let selectedValue: string | number = value;
-
-            if (name === "content_id") {
-                selectedValue = Number(options[selectedIndex].text);
-            }
-
-            if (name === "season_id") {
-                selectedValue = Number(options[selectedIndex].text);
-            }
-
-            return {
-                form_content: {
-                    ...state.form_content,
-                    [name as keyof typeof state.form_content]: selectedValue,
-                },
-            };
-        });
-    };
-
-    const addChapter = () => {
-        /*const newEpisode: Episodes = {
-            episode_id: Date.now(),
-            number: chapters.length + 1,
-            name: "",
-            url_video: "",
-            season_id: 0,
-            content_id: 0,
-        };
-
-        setChapters((prev) => [...prev, newEpisode]);
-         */
-    };
-
-    const handleChapterChange = (
-        id: number,
-        field: keyof Episodes,
-        value: string,
-    ) => {
-        setChapters((prev) =>
-            prev.map((ep) =>
-                ep.episode_id === id
-                    ? {
-                        ...ep,
-                        [field]: field === "number" ? Number(value) : value,
-                    }
-                    : ep,
-            ),
-        );
-    };
-
-    const removeChapter = (id: number) => {
-        const filtered = chapters
-            .filter((ep) => ep.episode_id !== id)
-            .map((ep, index) => ({
-                ...ep,
-                episode_number: index + 1,
-            }));
-
-        setChapters(filtered);
+        useContent.setState((state) => ({
+            form_episode: {
+                ...state.form_episode,
+                [name]: name === "season_id"
+                    ? Number(value)
+                    : value,
+            },
+        }));
     };
 
     useEffect(() => {
         getSeason()
-    }, [getContent, getSeason]);
+    }, [getSeason]);
 
-    const sendData = () => {
+    const addEpisode = () => {
+        const newEpisode: Episode = {
+            episode_id: 0,
+            number: episodes.episodes.length + 1,
+            name: "",
+            url_video: ""
+        };
 
+        setEpisodes(prev => ({
+            ...prev,
+            episodes: [...prev.episodes, newEpisode]
+        }));
+    };
+
+    const removeEpisode = (id: number) => {
+        setEpisodes(prev => ({
+            ...prev,
+            episodes: prev.episodes.filter(ep => ep.episode_id !== id)
+        }));
     };
 
     return (
@@ -101,6 +65,7 @@ export const Modal_Episode = () => {
 
                             <select
                                 name="season_id"
+                                value={form_episode.season_id}
                                 onChange={handleChangeSelect}
                                 className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
                             >
@@ -113,17 +78,17 @@ export const Modal_Episode = () => {
                             </select>
 
                             <button
+                                onClick={()  => addEpisode()}
                                 type="button"
-                                onClick={addChapter}
                                 className="text-purple-500 font-medium"
                             >
                                 + Añadir capítulo
                             </button>
 
                             <div className="flex flex-col gap-4 mt-2 max-h-40 overflow-y-auto scrollbar-purple pr-2">
-                                {chapters.map((chapter) => (
+                                {episodes.episodes.map((episode) => (
                                     <div
-                                        key={chapter.episode_id}
+                                        key={episode.episode_id}
                                         className="flex flex-col gap-2 bg-white dark:bg-gray-800 p-2 rounded-lg"
                                     >
 
@@ -131,13 +96,16 @@ export const Modal_Episode = () => {
                                             <input
                                                 type="text"
                                                 placeholder="Nombre del episodio"
-                                                value={chapter.name}
+                                                value={episode.name}
                                                 onChange={(e) =>
-                                                    handleChapterChange(
-                                                        chapter.episode_id,
-                                                        "name",
-                                                        e.target.value,
-                                                    )
+                                                    setEpisodes(prev => ({
+                                                        ...prev,
+                                                        episodes: prev.episodes.map(ep =>
+                                                            ep.episode_id === episode.episode_id
+                                                                ? { ...ep, name: e.target.value }
+                                                                : ep
+                                                        )
+                                                    }))
                                                 }
                                                 className="flex-1 px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
                                             />
@@ -145,46 +113,51 @@ export const Modal_Episode = () => {
                                             <input
                                                 type="number"
                                                 placeholder="#"
-                                                value={chapter.number}
+                                                value={episode.number}
                                                 onChange={(e) =>
-                                                    handleChapterChange(
-                                                        chapter.episode_id,
-                                                        "number",
-                                                        e.target.value,
-                                                    )
+                                                    setEpisodes(prev => ({
+                                                        ...prev,
+                                                        episodes: prev.episodes.map(ep =>
+                                                            ep.episode_id === episode.episode_id
+                                                                ? { ...ep, number: Number(e.target.value) }
+                                                                : ep
+                                                        )
+                                                    }))
                                                 }
-                                                className="w-20 px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
+                                                className="flex-1 px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
                                             />
                                         </div>
 
-                                        {/* URL debajo */}
                                         <input
                                             type="text"
                                             placeholder="URL del episodio"
-                                            value={chapter.url_video}
+                                            value={episode.url_video}
                                             onChange={(e) =>
-                                                handleChapterChange(
-                                                    chapter.episode_id,
-                                                    "url_video",
-                                                    e.target.value,
-                                                )
+                                                setEpisodes(prev => ({
+                                                    ...prev,
+                                                    episodes: prev.episodes.map(ep =>
+                                                        ep.episode_id === episode.episode_id
+                                                            ? { ...ep, url_video: e.target.value }
+                                                            : ep
+                                                    )
+                                                }))
                                             }
-                                            className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
+                                            className="flex-1 px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
                                         />
 
                                         <button
                                             type="button"
-                                            onClick={() => removeChapter(chapter.episode_id)}
+                                            onClick={() => removeEpisode(episode.episode_id)}
                                             className="text-red-500 text-sm self-end"
                                         >
                                             Eliminar
                                         </button>
+
                                     </div>
                                 ))}
                             </div>
 
                             <button
-                                onClick={() => sendData()}
                                 className="bg-purple-500 rounded-lg hover:bg-purple-600 text-white py-2 font-medium flex items-center justify-center gap-2 transition-all active:scale-95"
                             >
                                 <i className="bi bi-floppy"></i>
