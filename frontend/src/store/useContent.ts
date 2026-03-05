@@ -1,13 +1,13 @@
 import { create } from "zustand";
-import {Episode, Episodes} from "../models/Episode.ts";
+import {Episodes} from "../models/Episode.ts";
 import {
   Content,
   ContentDTO,
 } from "../models/Contents";
 import {
     Delete_Content,
-    GET_Contents, Get_Episode, GET_Find_Content,
-    POST_Content, PUT_Content,
+    GET_Contents, GET_Episode, GET_Find_Content,
+    POST_Content, POST_Episode, PUT_Content, PUT_Episode,
 } from "../helpers/Fetching_Content";
 import { Contents_List } from "../helpers/Data";
 import {useModal} from "./useModal.ts";
@@ -64,8 +64,8 @@ type Data = {
   removeContent: (id: number) => void;
 
   // EPISODE
-    getEpisode: (id: number, modal: string) => void
-    sendEpisode: (obj:Episode, modal:string) => void
+    getEpisode: (contentId: number, seasonId:number) => void
+    sendEpisode: (obj:Episodes, modal:string) => void
 
   reset: () => void;
 
@@ -203,11 +203,11 @@ export const useContent = create<Data>((set, get) => ({
     },
 
     // EPISODE
-    getEpisode: async (id: number, modal: string) => {
+    getEpisode: async (contentId: number, seasonId:number) => {
 
-        const result = await Get_Episode(id);
+        const result = await GET_Episode(contentId, seasonId);
 
-        useModal.getState().OpenModal(modal);
+        console.log(result.data)
 
         set({
             form_episode: result.data,
@@ -215,19 +215,19 @@ export const useContent = create<Data>((set, get) => ({
         });
     },
 
-    sendEpisode: async(obj:Episode) => {
+    sendEpisode: async(obj:Episodes) => {
 
-        //const { form_episode } = get();
+        const { form_episode } = get();
 
-      /* if (form_episode.content_id === 0) {
-            const result = await Post_Episode(obj);
+      if (form_episode.content_id === 0) {
+            const result = await POST_Episode(obj);
 
             if (!result.success) return result.error;
         } else {
-            const result = await Put_Episode(obj);
+            const result = await PUT_Episode(obj);
 
             if (!result.success) return result.error;
-        }*/
+        }
 
         get().reset();
         get().getContentSerie("");

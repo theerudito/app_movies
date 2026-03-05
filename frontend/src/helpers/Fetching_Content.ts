@@ -90,9 +90,9 @@ export const Delete_Content = async (id: number) => {
   }
 };
 
-export const Get_Episode = async (id: number) => {
+export const GET_Episode = async (contentId: number, seasonId:number) => {
     try {
-        const response = await axios.get<Episodes>(`${url_base}/content/episode/${id}`);
+        const response = await axios.get<Episodes>(`${url_base}/content/episode/${contentId}/${seasonId}`);
         return { success: true, data: response.data };
     } catch (error: unknown) {
         let message = "Error desconocido";
@@ -103,7 +103,7 @@ export const Get_Episode = async (id: number) => {
     }
 };
 
-export const Post_Episode = async (obj:Episodes) => {
+export const POST_Episode = async (obj:Episodes) => {
     try {
         const response = await axios.post(`${url_base}/content/episode`, obj);
         return { success: true, data: response.data };
@@ -116,7 +116,7 @@ export const Post_Episode = async (obj:Episodes) => {
     }
 };
 
-export const Put_Episode = async (obj:Episodes) => {
+export const PUT_Episode = async (obj:Episodes) => {
     try {
         const response = await axios.put(`${url_base}/content/episode`, obj);
         return { success: true, data: response.data };

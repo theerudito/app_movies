@@ -1,26 +1,26 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect} from "react";
 import { useModal } from "../store/useModal";
-import {initialEpisode, useContent} from "../store/useContent";
+import {useContent} from "../store/useContent";
 import {useData} from "../store/useData.ts";
-import {Episode, Episodes} from "../models/Episode.ts";
 
 export const Modal_Episode = () => {
     const { currentModal, CloseModal } = useModal((state) => state);
-    const [episodes, setEpisodes] = useState<Episodes>(initialEpisode());
-    const { form_episode} = useContent((state) => state);
+    const { form_episode } = useContent((state) => state);
     const { getSeason, season_list } = useData((state) => state);
 
     const handleChangeSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const {name, value} = e.target;
+
+        const value = Number(e.target.value);
 
         useContent.setState((state) => ({
             form_episode: {
                 ...state.form_episode,
-                [name]: name === "season_id"
-                    ? Number(value)
-                    : value,
+                season_id: value,
             },
         }));
+
+        useContent.getState().getEpisode(13, value);
+
     };
 
     useEffect(() => {
@@ -28,24 +28,10 @@ export const Modal_Episode = () => {
     }, [getSeason]);
 
     const addEpisode = () => {
-        const newEpisode: Episode = {
-            episode_id: 0,
-            number: episodes.episodes.length + 1,
-            name: "",
-            url_video: ""
-        };
 
-        setEpisodes(prev => ({
-            ...prev,
-            episodes: [...prev.episodes, newEpisode]
-        }));
     };
 
     const removeEpisode = (id: number) => {
-        setEpisodes(prev => ({
-            ...prev,
-            episodes: prev.episodes.filter(ep => ep.episode_id !== id)
-        }));
     };
 
     return (
@@ -86,7 +72,8 @@ export const Modal_Episode = () => {
                             </button>
 
                             <div className="flex flex-col gap-4 mt-2 max-h-40 overflow-y-auto scrollbar-purple pr-2">
-                                {episodes.episodes.map((episode) => (
+                                {Array.isArray(form_episode.episodes) &&
+                                    form_episode.episodes.map((episode) => (
                                     <div
                                         key={episode.episode_id}
                                         className="flex flex-col gap-2 bg-white dark:bg-gray-800 p-2 rounded-lg"
@@ -97,16 +84,6 @@ export const Modal_Episode = () => {
                                                 type="text"
                                                 placeholder="Nombre del episodio"
                                                 value={episode.name}
-                                                onChange={(e) =>
-                                                    setEpisodes(prev => ({
-                                                        ...prev,
-                                                        episodes: prev.episodes.map(ep =>
-                                                            ep.episode_id === episode.episode_id
-                                                                ? { ...ep, name: e.target.value }
-                                                                : ep
-                                                        )
-                                                    }))
-                                                }
                                                 className="flex-1 px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
                                             />
 
@@ -114,16 +91,6 @@ export const Modal_Episode = () => {
                                                 type="number"
                                                 placeholder="#"
                                                 value={episode.number}
-                                                onChange={(e) =>
-                                                    setEpisodes(prev => ({
-                                                        ...prev,
-                                                        episodes: prev.episodes.map(ep =>
-                                                            ep.episode_id === episode.episode_id
-                                                                ? { ...ep, number: Number(e.target.value) }
-                                                                : ep
-                                                        )
-                                                    }))
-                                                }
                                                 className="flex-1 px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
                                             />
                                         </div>
@@ -132,16 +99,6 @@ export const Modal_Episode = () => {
                                             type="text"
                                             placeholder="URL del episodio"
                                             value={episode.url_video}
-                                            onChange={(e) =>
-                                                setEpisodes(prev => ({
-                                                    ...prev,
-                                                    episodes: prev.episodes.map(ep =>
-                                                        ep.episode_id === episode.episode_id
-                                                            ? { ...ep, url_video: e.target.value }
-                                                            : ep
-                                                    )
-                                                }))
-                                            }
                                             className="flex-1 px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
                                         />
 
