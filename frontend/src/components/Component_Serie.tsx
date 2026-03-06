@@ -63,7 +63,7 @@ export const Component_Serie = () => {
                             onClick={() => getContent(item, "content")}
                             className="bi bi-pencil text-white text-lg cursor-pointer hover:text-purple-400" ></i>
                         <i
-                            onClick={() => OpenModal("episode")}
+                            onClick={() => OpenModal("episode", item.content_id)}
                             className="bi bi-card-list text-white text-lg cursor-pointer hover:text-purple-400"
                         ></i>
                         <i

@@ -1,37 +1,90 @@
-import React, {useEffect} from "react";
+import React, { useEffect } from "react";
 import { useModal } from "../store/useModal";
-import {useContent} from "../store/useContent";
-import {useData} from "../store/useData.ts";
+import { useContent } from "../store/useContent";
+import { useData } from "../store/useData";
 
 export const Modal_Episode = () => {
-    const { currentModal, CloseModal } = useModal((state) => state);
-    const { form_episode } = useContent((state) => state);
+    const { currentModal, CloseModal, contendId } = useModal((state) => state);
+    const { form_episode, getEpisode, sendEpisode } = useContent((state) => state);
     const { getSeason, season_list } = useData((state) => state);
 
-    const handleChangeSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    useEffect(() => {
+        getSeason();
 
-        const value = Number(e.target.value);
+        useContent.setState((state) => ({
+            form_episode: state.form_episode ?? {
+                content_id: contendId,
+                season_id: season_list.length > 0 ? season_list[0].season_id : 0,
+                season: "",
+                episodes: [],
+            },
+        }));
+    }, [getSeason, contendId, season_list]);
+
+    const handleChangeSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const seasonId = Number(e.target.value);
 
         useContent.setState((state) => ({
             form_episode: {
                 ...state.form_episode,
-                season_id: value,
+                season_id: seasonId,
+                episodes: [], 
             },
         }));
 
-        useContent.getState().getEpisode(13, value);
-
+        if (seasonId !== 0) {
+            getEpisode(contendId, seasonId); // carga episodios solo si hay temporada seleccionada
+        }
     };
 
-    useEffect(() => {
-        getSeason()
-    }, [getSeason]);
+    const updateEpisode = (
+        id: number,
+        field: "name" | "number" | "url_video",
+        value: string | number
+    ) => {
+        useContent.setState((state) => ({
+            form_episode: {
+                ...state.form_episode,
+                episodes: state.form_episode.episodes.map((ep) =>
+                    ep.episode_id === id ? { ...ep, [field]: value } : ep
+                ),
+            },
+        }));
+    };
 
     const addEpisode = () => {
+        useContent.setState((state) => {
+            const form = state.form_episode ?? {
+                content_id: contendId,
+                season_id: 0,
+                season: "",
+                episodes: [],
+            };
 
+            return {
+                form_episode: {
+                    ...form,
+                    episodes: [
+                        ...(form.episodes ?? []),
+                        {
+                            episode_id: Date.now(),
+                            number: (form.episodes?.length ?? 0) + 1,
+                            name: "",
+                            url_video: "",
+                        },
+                    ],
+                },
+            };
+        });
     };
 
     const removeEpisode = (id: number) => {
+        useContent.setState((state) => ({
+            form_episode: {
+                ...state.form_episode,
+                episodes: state.form_episode.episodes.filter((ep) => ep.episode_id !== id),
+            },
+        }));
     };
 
     return (
@@ -48,14 +101,14 @@ export const Modal_Episode = () => {
                         </div>
 
                         <div className="flex flex-col gap-4">
-
+                            {/* Select temporada */}
                             <select
                                 name="season_id"
-                                value={form_episode.season_id}
+                                value={form_episode?.season_id ?? 0}
                                 onChange={handleChangeSelect}
                                 className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
                             >
-                                <option value="0">SELECCIONA UNA TEMPORADA</option>
+                                <option >SELECCIONA TEMPORADA</option>
                                 {season_list.map((item) => (
                                     <option key={item.season_id} value={item.season_id}>
                                         {item.season_name}
@@ -64,7 +117,7 @@ export const Modal_Episode = () => {
                             </select>
 
                             <button
-                                onClick={()  => addEpisode()}
+                                onClick={addEpisode}
                                 type="button"
                                 className="text-purple-500 font-medium"
                             >
@@ -72,49 +125,57 @@ export const Modal_Episode = () => {
                             </button>
 
                             <div className="flex flex-col gap-4 mt-2 max-h-40 overflow-y-auto scrollbar-purple pr-2">
-                                {Array.isArray(form_episode.episodes) &&
+                                {Array.isArray(form_episode?.episodes) &&
                                     form_episode.episodes.map((episode) => (
-                                    <div
-                                        key={episode.episode_id}
-                                        className="flex flex-col gap-2 bg-white dark:bg-gray-800 p-2 rounded-lg"
-                                    >
+                                        <div
+                                            key={episode.episode_id}
+                                            className="flex flex-col gap-2 bg-white dark:bg-gray-800 p-2 rounded-lg"
+                                        >
+                                            <div className="flex gap-2">
+                                                <input
+                                                    type="text"
+                                                    placeholder="Nombre del episodio"
+                                                    value={episode.name}
+                                                    onChange={(e) =>
+                                                        updateEpisode(episode.episode_id, "name", e.target.value)
+                                                    }
+                                                    className="flex-1 px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
+                                                />
 
-                                        <div className="flex gap-2">
+                                                <input
+                                                    type="number"
+                                                    placeholder="#"
+                                                    value={episode.number}
+                                                    onChange={(e) =>
+                                                        updateEpisode(episode.episode_id, "number", Number(e.target.value))
+                                                    }
+                                                    className="flex-1 px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
+                                                />
+                                            </div>
+
                                             <input
                                                 type="text"
-                                                placeholder="Nombre del episodio"
-                                                value={episode.name}
+                                                placeholder="URL del episodio"
+                                                value={episode.url_video}
+                                                onChange={(e) =>
+                                                    updateEpisode(episode.episode_id, "url_video", e.target.value)
+                                                }
                                                 className="flex-1 px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
                                             />
 
-                                            <input
-                                                type="number"
-                                                placeholder="#"
-                                                value={episode.number}
-                                                className="flex-1 px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
-                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => removeEpisode(episode.episode_id)}
+                                                className="text-red-500 text-sm self-end"
+                                            >
+                                                Eliminar
+                                            </button>
                                         </div>
-
-                                        <input
-                                            type="text"
-                                            placeholder="URL del episodio"
-                                            value={episode.url_video}
-                                            className="flex-1 px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
-                                        />
-
-                                        <button
-                                            type="button"
-                                            onClick={() => removeEpisode(episode.episode_id)}
-                                            className="text-red-500 text-sm self-end"
-                                        >
-                                            Eliminar
-                                        </button>
-
-                                    </div>
-                                ))}
+                                    ))}
                             </div>
 
                             <button
+                                onClick={() => sendEpisode()}
                                 className="bg-purple-500 rounded-lg hover:bg-purple-600 text-white py-2 font-medium flex items-center justify-center gap-2 transition-all active:scale-95"
                             >
                                 <i className="bi bi-floppy"></i>

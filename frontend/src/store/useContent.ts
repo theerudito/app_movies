@@ -7,7 +7,7 @@ import {
 import {
     Delete_Content,
     GET_Contents, GET_Episode, GET_Find_Content,
-    POST_Content, POST_Episode, PUT_Content, PUT_Episode,
+    POST_Content, PUT_Content, PUT_Episode,
 } from "../helpers/Fetching_Content";
 import { Contents_List } from "../helpers/Data";
 import {useModal} from "./useModal.ts";
@@ -22,21 +22,12 @@ const initialContent = (): Content => ({
     gender_id: 0,
 });
 
-export const initialEpisode = (): Episodes => (
-    {
-        content_id : 0,
-        season_id : 0,
-        episodes :[
-            {
-                episode_id: 0,
-                number: 0,
-                name: "",
-                url_video: ""
-            }
-        ]
-    }
-);
-
+export const initialEpisode = () => ({
+    content_id: 0,
+    season_id: 0,
+    season: "",
+    episodes: []
+});
 type Data = {
 
     // LISTADOS
@@ -65,7 +56,7 @@ type Data = {
 
   // EPISODE
     getEpisode: (contentId: number, seasonId:number) => void
-    sendEpisode: (obj:Episodes, modal:string) => void
+    sendEpisode: () => void
 
   reset: () => void;
 
@@ -203,31 +194,55 @@ export const useContent = create<Data>((set, get) => ({
     },
 
     // EPISODE
-    getEpisode: async (contentId: number, seasonId:number) => {
+    getEpisode: async (contentId: number, seasonId: number) => {
 
-        const result = await GET_Episode(contentId, seasonId);
+        useContent.setState((state) => ({
+            form_episode: {
+                ...state.form_episode,
+                season_id: seasonId,
+                episodes: [],
+            },
+        }));
 
-        console.log(result.data)
+        try {
+            const result = await GET_Episode(contentId, seasonId);
 
-        set({
-            form_episode: result.data,
-            isEditing: true
-        });
+            if (result.data && result.data.episodes?.length > 0) {
+                set({
+                    form_episode: result.data,
+                    isEditing: true,
+                });
+            } else {
+                set((state) => ({
+                    form_episode: {
+                        ...state.form_episode,
+                        content_id: contentId,
+                        season_id: seasonId,
+                        episodes: [],
+                    },
+                    isEditing: false,
+                }));
+            }
+        } catch {
+            set((state) => ({
+                form_episode: {
+                    ...state.form_episode,
+                    content_id: contentId,
+                    season_id: seasonId,
+                    episodes: [],
+                },
+                isEditing: false,
+            }));
+        }
     },
 
-    sendEpisode: async(obj:Episodes) => {
+    sendEpisode: async() => {
 
         const { form_episode } = get();
 
-      if (form_episode.content_id === 0) {
-            const result = await POST_Episode(obj);
+        const result = await PUT_Episode(form_episode);
 
-            if (!result.success) return result.error;
-        } else {
-            const result = await PUT_Episode(obj);
-
-            if (!result.success) return result.error;
-        }
+        if (!result.success) return result.error;
 
         get().reset();
         get().getContentSerie("");

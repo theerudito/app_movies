@@ -605,15 +605,13 @@ func DeleteContent(c *fiber.Ctx) error {
 
 func GetEpisode(c *fiber.Ctx) error {
 	var (
-		contentId int
-		seasonId  int
-		season    string
-		conn      = db.GetDB()
-		rows      *sql.Rows
-		err       error
-		id        = c.Params("contentId")
-		s         = c.Params("seasonId")
-		exist     int
+		conn     = db.GetDB()
+		rows     *sql.Rows
+		err      error
+		id       = c.Params("contentId")
+		s        = c.Params("seasonId")
+		exist    int
+		episodes dto.EpisodesDTO
 	)
 
 	qContent := `SELECT COUNT(*) FROM episode WHERE content_id = $1`
@@ -634,18 +632,17 @@ func GetEpisode(c *fiber.Ctx) error {
 	    s.season_id,
 	    s.season_name,
 	    e.episode_id,
-	    e.episode_name,
 	    e.episode_number,
+	    e.episode_name,
 	    i.url
 	FROM episode AS e
 	LEFT JOIN content_type AS c ON e.content_id = c.content_id
 	LEFT JOIN season AS s ON e.season_id = s.season_id
 	LEFT JOIN storage AS i ON i.storage_id = e.video_id
 	WHERE e.content_id = $1 AND e.season_id = $2
-	ORDER BY e.episode_id`
+	ORDER BY e.episode_number`
 
 	rows, err = conn.Query(qEpisode, id, s)
-
 	if err != nil {
 		_ = helpers.InsertLogsError(conn, "episode", "error ejecutando la consulta "+err.Error())
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error al ejecutar la consulta"})
@@ -653,49 +650,33 @@ func GetEpisode(c *fiber.Ctx) error {
 
 	defer rows.Close()
 
-	seasonMap := make(map[int]*dto.EpisodesDTO)
-
 	for rows.Next() {
 
 		var episode dto.EpisodeDTO
 
 		err = rows.Scan(
-			&contentId,
-			&seasonId,
-			&season,
+			&episodes.ContentId,
+			&episodes.SeasonId,
+			&episodes.Season,
 			&episode.EpisodeId,
 			&episode.Number,
 			&episode.Name,
-			&episode.UrlVideo)
+			&episode.UrlVideo,
+		)
 
 		if err != nil {
 			_ = helpers.InsertLogsError(conn, "episode", "Error al leer los registros "+err.Error())
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error al leer los registros"})
 		}
 
-		if _, exists := seasonMap[seasonId]; !exists {
-			seasonMap[seasonId] = &dto.EpisodesDTO{
-				ContentId: contentId,
-				SeasonId:  seasonId,
-				Season:    season,
-				Episodes:  []dto.EpisodeDTO{},
-			}
-		}
-
-		seasonMap[seasonId].Episodes = append(seasonMap[seasonId].Episodes, episode)
+		episodes.Episodes = append(episodes.Episodes, episode)
 	}
 
-	if len(seasonMap) == 0 {
+	if len(episodes.Episodes) == 0 {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "No se encontraron registros"})
 	}
 
-	var response []dto.EpisodesDTO
-	for _, season := range seasonMap {
-		response = append(response, *season)
-	}
-
-	return c.JSON(response)
-
+	return c.JSON(episodes)
 }
 
 func PostEpisode(c *fiber.Ctx) error {
@@ -882,7 +863,8 @@ func PutEpisode(c *fiber.Ctx) error {
 
 		err = tx.QueryRow(`
 			INSERT INTO episode (episode_name, episode_number, video_id, season_id, content_id)
-			VALUES ($1, $2, $3, $4, $5)`,
+			VALUES ($1, $2, $3, $4, $5)
+			RETURNING episode_id`,
 			strings.ToUpper(ep.Name),
 			ep.Number,
 			videoId,
