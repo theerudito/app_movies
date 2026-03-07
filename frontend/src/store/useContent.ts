@@ -1,11 +1,11 @@
 import { create } from "zustand";
 import {Episodes} from "../models/Episode.ts";
 import {
-  Content,
-  ContentDTO,
+    Content,
+    ContentDTO, ContentFullDTO,
 } from "../models/Contents";
 import {
-    Delete_Content,
+    Delete_Content, GET_Content,
     GET_Contents, GET_Episode, GET_Find_Content,
     POST_Content, PUT_Content, PUT_Episode,
 } from "../helpers/Fetching_Content";
@@ -28,13 +28,19 @@ export const initialEpisode = () => ({
     season: "",
     episodes: []
 });
+
 type Data = {
 
     // LISTADOS
   list_anime: ContentDTO[];
   list_serie: ContentDTO[];
+  content_full: ContentFullDTO | null,
+
+    loading: boolean,
+    error: string | null,
 
   isEditing: boolean;
+
   contend_id: number;
 
   // DATOS
@@ -50,6 +56,7 @@ type Data = {
   getContentAnime: (location: string) => void;
   getContentSerie: (location: string) => void;
   getContent: (obj:ContentDTO, modal:string) => void;
+  getContentFull: (id: number) => void;
   findContent: (value:string) => void;
   sendContent: (obj: Content) => void;
   removeContent: (id: number) => void;
@@ -71,6 +78,10 @@ export const useContent = create<Data>((set, get) => ({
     // LISTADOS
     list_anime: [],
     list_serie: [],
+    content_full: null,
+
+    loading: false,
+    error: null,
 
     isEditing: false,
 
@@ -99,7 +110,6 @@ export const useContent = create<Data>((set, get) => ({
         } else {
             set({list_anime: Contents_List});
         }
-
     },
 
     getContentSerie: async (location: string) => {
@@ -130,6 +140,23 @@ export const useContent = create<Data>((set, get) => ({
             isEditing: true
         })
 
+    },
+
+    getContentFull: async (id: number) => {
+        set({ loading: true });
+
+        try {
+            const result = await GET_Content(id);
+
+            if (result.success && result.data) {
+                set({ content_full: result.data });
+            }
+
+        } catch {
+            set({ error: "Error obteniendo contenido" });
+        }
+
+        set({ loading: false });
     },
 
     findContent: async (value:string) => {

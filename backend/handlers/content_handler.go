@@ -105,7 +105,8 @@ func GetContentId(c *fiber.Ctx) error {
 				WHEN c.content_type = 1 
 				THEN 'ANIME'
 				ELSE 'SERIE'
-			END AS type
+			END AS type,
+		    c.content_type
 		FROM content_type c
 		INNER JOIN gender g ON g.gender_id = c.gender_id
 		INNER JOIN storage s ON s.storage_id = c.cover_id
@@ -118,11 +119,12 @@ func GetContentId(c *fiber.Ctx) error {
 		&content.StorageId,
 		&content.UrlCover,
 		&content.Type,
-	)
+		&content.ContentTypeId)
 
 	if errors.Is(err, sql.ErrNoRows) {
 		return c.Status(404).JSON(fiber.Map{"error": "Contenido no encontrado"})
 	}
+
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Error al obtener contenido"})
 	}
@@ -131,10 +133,11 @@ func GetContentId(c *fiber.Ctx) error {
 		SELECT 
 		    s.season_id, 
 		    s.season_name
-		FROM season AS s
-		INNER JOIN episode AS e ON e.season_id = s.season_id
-		INNER JOIN content_type AS c ON e.content_id = c.content_id
-		WHERE c.content_id = $1`, id)
+		FROM season s
+		INNER JOIN episode e ON e.season_id = s.season_id
+		WHERE e.content_id = $1
+		GROUP BY s.season_id, s.season_name
+		ORDER BY s.season_id`, id)
 
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Error al obtener temporadas"})
@@ -142,16 +145,17 @@ func GetContentId(c *fiber.Ctx) error {
 
 	defer rowsSeason.Close()
 
-	var seasons []dto.ContentSeasonDTO
+	var seasons []dto.ContentFullSeasonDTO
 
 	for rowsSeason.Next() {
 
-		var season dto.ContentSeasonDTO
+		var season dto.ContentFullSeasonDTO
 
 		err = rowsSeason.Scan(
 			&season.SeasonId,
 			&season.SeasonName,
 		)
+
 		if err != nil {
 			return c.Status(500).JSON(fiber.Map{"error": "Error al leer temporada"})
 		}
@@ -161,27 +165,26 @@ func GetContentId(c *fiber.Ctx) error {
 				e.episode_id,
 				e.episode_number,
 				e.episode_name,
-				s.storage_id,
 				s.url
 			FROM episode e
 			INNER JOIN storage s ON s.storage_id = e.video_id
-			WHERE e.season_id = $1`, season.SeasonId)
+			WHERE e.season_id = $1
+			ORDER BY e.episode_number`, season.SeasonId)
 
 		if err != nil {
 			return c.Status(500).JSON(fiber.Map{"error": "Error al obtener episodios"})
 		}
 
-		var episodes []dto.SeasonEpisodeDTO
+		var episodes []dto.ContentFullEpisodeDTO
 
 		for rowsEpisode.Next() {
 
-			var episode dto.SeasonEpisodeDTO
+			var episode dto.ContentFullEpisodeDTO
 
 			err = rowsEpisode.Scan(
 				&episode.EpisodeId,
 				&episode.Number,
 				&episode.Name,
-				&episode.StorageId,
 				&episode.UrlVideo,
 			)
 
@@ -195,66 +198,16 @@ func GetContentId(c *fiber.Ctx) error {
 
 		rowsEpisode.Close()
 
-		season.SeasonEpisode = episodes
+		season.Episodes = episodes
 		seasons = append(seasons, season)
 	}
 
-	full = dto.ContentFullDTO{Content: content, Season: seasons}
+	full = dto.ContentFullDTO{
+		Content: content,
+		Seasons: seasons,
+	}
 
 	return c.JSON(full)
-}
-
-func GetContentSeasonId(c *fiber.Ctx) error {
-
-	var (
-		obj       []dto.SeasonEpisodeDTO
-		conn      = db.GetDB()
-		rows      *sql.Rows
-		err       error
-		seasonId  = c.Params("seasonId")
-		contendId = c.Params("contendId")
-	)
-
-	rows, err = conn.Query(`
-	SELECT
-		e.episode_id,
-		e.episode_name,
-		e.episode_number,
-		s.storage_id,
-		s.url
-	FROM episode e
-		INNER JOIN storage AS s ON s.storage_id = e.video_id
-		WHERE e.season_id = $1 AND e.content_id = $2 `, seasonId, contendId)
-
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error al ejecutar la consulta"})
-	}
-
-	defer rows.Close()
-
-	for rows.Next() {
-
-		var e dto.SeasonEpisodeDTO
-
-		err = rows.Scan(
-			&e.EpisodeId,
-			&e.Name,
-			&e.Number,
-			&e.StorageId,
-			&e.UrlVideo)
-
-		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error al leer los registros"})
-		}
-
-		obj = append(obj, e)
-	}
-
-	if len(obj) == 0 {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "No se encontraron registros"})
-	}
-
-	return c.JSON(obj)
 }
 
 func GetFindContent(c *fiber.Ctx) error {

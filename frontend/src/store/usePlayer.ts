@@ -1,31 +1,36 @@
 import { create } from "zustand";
 
 type PlayerStore = {
-  url: string;
-  playing: boolean;
-  open_player: (url: string) => void;
-  close_player: () => void;
-  reset: () => void;
+    url: string;
+    playing: boolean;
+    location: string;
+    open_player: (url: string, location: string) => void;
+    reset: (goBack: (location: string) => void) => void;
 };
 
-export const usePlayer = create<PlayerStore>((set) => ({
-  url: "",
-  playing: false,
+export const usePlayer = create<PlayerStore>((set, get) => ({
+    url: "",
+    playing: false,
+    location: "",
 
-  open_player: (url: string) =>
-    set({
-      url,
-      playing: true,
-    }),
+    open_player: (url: string, location: string) =>
+        set({
+            url,
+            playing: true,
+            location,
+        }),
 
-  close_player: () =>
-    set({
-      playing: false,
-    }),
-
-  reset: () =>
-    set({
-      url: "",
-      playing: false,
-    }),
+    reset: (goBack) => {
+        const { location } = get();
+        if (location) {
+            goBack(location);
+        } else {
+            goBack("/");
+        }
+        set({
+            url: "",
+            playing: false,
+            location: "",
+        });
+    },
 }));

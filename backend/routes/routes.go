@@ -38,7 +38,6 @@ func SetupRoutes(app *fiber.App) {
 	// CONTENT
 	v1.Get("/content/by/:type", handlers.GetContent)
 	v1.Get("/content/:id", handlers.GetContentId)
-	v1.Get("/content/season/:contendId/:seasonId", handlers.GetContentSeasonId)
 	v1.Get("/content/:type/find/:value", handlers.GetFindContent)
 	v1.Post("/content", handlers.PostContent)
 	v1.Put("/content", handlers.PutContent)

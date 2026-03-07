@@ -14,21 +14,19 @@ type ContentDTO struct {
 }
 
 type ContentFullDTO struct {
-	SeasonId int                `json:"season_id"`
-	Content  ContentDTO         `json:"content"`
-	Season   []ContentSeasonDTO `json:"seasons"`
+	Content ContentDTO             `json:"content"`
+	Seasons []ContentFullSeasonDTO `json:"seasons"`
 }
 
-type ContentSeasonDTO struct {
-	SeasonId      int                `json:"season_id"`
-	SeasonName    string             `json:"season_name"`
-	SeasonEpisode []SeasonEpisodeDTO `json:"episodes"`
+type ContentFullSeasonDTO struct {
+	SeasonId   int                     `json:"season_id"`
+	SeasonName string                  `json:"season_name"`
+	Episodes   []ContentFullEpisodeDTO `json:"episodes"`
 }
 
-type SeasonEpisodeDTO struct {
+type ContentFullEpisodeDTO struct {
 	EpisodeId int    `json:"episode_id"`
 	Number    int    `json:"number"`
 	Name      string `json:"name"`
-	StorageId int    `json:"storage_id"`
 	UrlVideo  string `json:"url_video"`
 }

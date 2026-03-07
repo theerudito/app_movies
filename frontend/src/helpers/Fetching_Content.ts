@@ -1,7 +1,7 @@
 import axios from "axios";
 import {
-  Content,
-  ContentDTO,
+    Content,
+    ContentDTO, ContentFullDTO,
 } from "../models/Contents";
 import { url_base } from "./Initial";
 import { AddGuiones } from "./Añadir_Guiones";
@@ -25,7 +25,7 @@ export const GET_Contents = async (type: number) => {
 
 export const GET_Content = async (id: number) => {
     try {
-        const response = await axios.get<ContentDTO>(`${url_base}/content/${id}`);
+        const response = await axios.get<ContentFullDTO>(`${url_base}/content/${id}`);
         return { success: true, data: response.data };
     } catch (error: unknown) {
         let message = "Error desconocido";
